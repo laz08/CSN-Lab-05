@@ -35,15 +35,12 @@ getTwoRandomNodes <- function(m, m.0, nodeList, n){
         # First iteration, disconnected graph
         pi.k = rep(1, n)
     } else {
-        
         # Compute probs
         for(i in seq(n)) {
             ki = sum(m[i, ])
             pi.k = append(pi.k, ki/sum.kj)
         }
-        
     }
-    
     selectedNodes <- sample(nodeList[1:n], m.0, prob = (pi.k + 0.1))
     return(selectedNodes)
 }
@@ -52,12 +49,11 @@ getTwoRandomNodes <- function(m, m.0, nodeList, n){
 getNodesDegree <- function(adj.mat) {
     
     ks = c()
+    
     for (n in seq(nrow(adj.mat))) {
-        
         ki = sum(adj.mat[n, ])
         ks = append(ks, ki)
     }
-    
     return(ks)
 }
 
@@ -65,14 +61,13 @@ getNodesDegree <- function(adj.mat) {
 
 generateBarabasiAlbertModel <- function(ts, n.0, m.0, timeseriesTimestamps) {
     
-    nodeList = seq(ts)
+    nodeList = seq(ts + n.0)
     matSize = ts + n.0
     adj.mat = Matrix(0, ncol = matSize, nrow = matSize, sparse=TRUE) 
     
     n = n.0 + 1
     
     for(t in seq(ts)){
-      
       selectedNodes <- getTwoRandomNodes(adj.mat, m.0, nodeList, n)
       
       n1 = selectedNodes[1]
@@ -90,7 +85,6 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, timeseriesTimestamps) {
       if(t%%100 == 0){
           cat("t: ", t,"\n")
       }
-      
     }
     return(adj.mat)
 }
