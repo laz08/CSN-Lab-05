@@ -1,3 +1,5 @@
+library("Matrix")
+
 getTwoRandomNodes <- function(m, m.0, nodeList, n){
     
     n = n - 1
@@ -24,13 +26,13 @@ getTwoRandomNodes <- function(m, m.0, nodeList, n){
 
 
 
-ts = 10 #TODO: 100000       # Max ts
+ts = 10000 #TODO: 100000       # Max ts
 n.0 <- 3
 m.0 = 2
 
 nodeList = seq(ts)
 matSize = ts + n.0
-adj.mat = matrix(0, ncol = matSize, nrow = matSize) 
+adj.mat = Matrix(0, ncol = matSize, nrow = matSize, sparse=TRUE) 
 
 
 n = n.0 + 1
@@ -49,5 +51,25 @@ for(t in seq(ts)){
     adj.mat[n2, n] <- 1
     
     n = n + 1
+    
+    if(t%%100 == 0){
+        cat("t: ", t,"\n")
+    }
 }
 adj.mat
+
+
+
+getNodesDegree <- function(adj.mat) {
+  
+  ks = c()
+  for (n in seq(nrow(adj.mat))) {
+      
+      ki = sum(adj.mat[n, ])
+      ks = append(ks, ki)
+  }
+
+  return(ks)
+}
+
+getNodesDegree(adj.mat)
