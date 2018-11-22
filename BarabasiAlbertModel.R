@@ -21,6 +21,12 @@ if(grepl("nora", wd)) {
 }
 rm(wd)
 
+
+#################
+### Sourcing  ###
+#################
+source("commonFunctions.R")
+
 #################
 ### Functions ###
 #################
@@ -46,20 +52,7 @@ getTwoRandomNodes <- function(m, m.0, nodeList, n){
 }
 
 
-getNodesDegree <- function(adj.mat) {
-    
-    ks = c()
-    
-    for (n in seq(nrow(adj.mat))) {
-        ki = sum(adj.mat[n, ])
-        ks = append(ks, ki)
-    }
-    return(ks)
-}
-
-
-
-generateBarabasiAlbertModel <- function(ts, n.0, m.0, timeseriesTimestamps) {
+generateBarabasiAlbertModel <- function(ts, n.0, m.0, timestamps) {
     
     nodeList = seq(ts + n.0)
     matSize = ts + n.0
@@ -85,6 +78,11 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, timeseriesTimestamps) {
       if(t%%100 == 0){
           cat("t: ", t,"\n")
       }
+      
+      if(t %in% timestamps){
+        # Save degree sequence
+        saveNodesDegreeOnFile(t, adj.mat)
+      }
     }
     return(adj.mat)
 }
@@ -96,12 +94,27 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, timeseriesTimestamps) {
 #################
 #################
 
-t.max <- 10000
 
-t.max = 10
-n.0 <- 3
-m.0 <- 2
-timeseriesTimestamps <- c(1, 10, 100, 1000)
+runBarabasiAlbertModelConstruction <- function() {
+  
+    
+  t.max <- 10000
+  
+  #t.max = 10
+  n.0 <- 3
+  m.0 <- 2
+  timestamps <- c(1, 10, 100, 1000)
+  #timestamps = c(1, 3, 5)
+  
+  start = Sys.time()
+  adj.mat = generateBarabasiAlbertModel(t.max, n.0, m.0, timestamps)
+  end = Sys.time()
+  saveNodesDegreeOnFile(t.max, adj.mat, "BA_t_")
+  
+  elapsedTime = end - start
+  cat("Elasped time: ", elapsedTime, "\n")
 
-adj.mat = generateBarabasiAlbertModel(t.max, n.0, m.0, timeseriesTimestamps)
-getNodesDegree(adj.mat)
+}
+
+
+runBarabasiAlbertModelConstruction()
