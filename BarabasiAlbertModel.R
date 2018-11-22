@@ -14,9 +14,9 @@ rm(requiredPackages)
 # Set WD and load data
 wd = getwd()
 if(grepl("nora", wd)) {
-    setwd("~/git/csn-labs/03")
+    setwd("~/Documents/18-19/CSN/LABS/05")
 } else {
-    # Set Pietro Working directory
+    # Set Piero Working directory
     setwd("")
 }
 rm(wd)
@@ -81,7 +81,7 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, timestamps) {
       
       if(t %in% timestamps){
         # Save degree sequence
-        saveNodesDegreeOnFile(t, adj.mat)
+        saveNodesDegreeOnFile(t, adj.mat, "BA_t_")
       }
     }
     return(adj.mat)
@@ -98,7 +98,7 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, timestamps) {
 runBarabasiAlbertModelConstruction <- function() {
   
     
-  t.max <- 10000
+  t.max <- 3500
   
   #t.max = 10
   n.0 <- 3
