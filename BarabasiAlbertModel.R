@@ -28,6 +28,7 @@ rm(wd)
 source("commonFunctions.R")
 
 APPLY_PROFILING = FALSE
+LOAD_EXISTING_RUN = TRUE
 #################
 ### Functions ###
 #################
@@ -152,21 +153,37 @@ runBarabasiAlbertModelConstruction <- function(t.max) {
 }
 
 
-t.max = 10000
 
-if(APPLY_PROFILING){
-    Rprof(tmp <- tempfile())
-    runBarabasiAlbertModelConstruction(t.max)
-    Rprof()
-    summaryRprof(tmp)
+if(!LOAD_EXISTING_RUN){
+    t.max = 10000
+    
+    if(APPLY_PROFILING){
+        Rprof(tmp <- tempfile())
+        runBarabasiAlbertModelConstruction(t.max)
+        Rprof()
+        summaryRprof(tmp)
+    } else {
+        runBarabasiAlbertModelConstruction(t.max)
+    }
 } else {
-    runBarabasiAlbertModelConstruction(t.max)
+    ks.1 = read.csv2("BA_v_00001.csv"); ks.1 = ks.1$x
+    ks.2 = read.csv2("BA_v_00010.csv"); ks.2 = ks.2$x
+    ks.3 = read.csv2("BA_v_00100.csv"); ks.3 = ks.3$x
+    ks.4 = read.csv2("BA_v_01000.csv"); ks.4 = ks.4$x
+    
+    table = data.frame(sequ = seq(length(ks.1)), ks.1, ks.2, ks.3, ks.4)
 }
 
 
-ks = read.csv2("BA_v_00001.csv")
-ks = as.vector(ks)
-plot(ks, ylab = "k", xlab = "Num of nodes", main="Degrees distribution")
+library("esquisse")
+esquisser(viewer = "browser")
+library("ggplot2")
+library("ggthemes")
 
-
-
+ggplot(data = table) +
+  aes(x = sequ, y = ks.1) +
+  geom_point(color = '#0c4c8a') +
+  labs(title = 'Vertex 1 degree evolution',
+    x = 't',
+    y = 'k') +
+  theme_calc()
