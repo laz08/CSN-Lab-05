@@ -49,45 +49,9 @@ getTwoRandomNodes <- function(sum.kj, m.0, nodeList, n, k){
 }
 
 
+
+
 generateBarabasiAlbertModel <- function(ts, n.0, m.0, timestamps) {
-  
-    n.max = ts + n.0  
-    nodeList = seq(n.max)   ## Vector representing idx from 1..n.max
-    k = rep(0, n.max)       ## Degrees of each node. Start on 0
-    sum.kj = 0              ## Total sum of degrees
-    
-    n = n.0 + 1
-
-    for(t in seq(ts)){
-      selectedNodes <- getTwoRandomNodes(sum.kj, m.0, nodeList, n, k)
-      
-      n1 = selectedNodes[1]
-      n2 = selectedNodes[2]
-      
-      ## Add num. of edges added on each it to the total sum
-      sum.kj <- sum.kj + m.0
-      
-      ## Increase degree of each vertice
-      k[n1] <- k[n1] + 1
-      k[n2] <- k[n2] + 1
-      
-      n = n + 1
-      
-      # Printing to keep track of the execution :)
-      if(t%%100 == 0){
-          cat("t: ", t,"\n")
-      }
-      
-      if(t %in% timestamps){
-        # Save degree sequence
-        saveNodesDegreeOnFile(t, k, "BA_t_")
-      }
-    }
-    return(k)
-}
-
-
-generateBarabasiAlbertModelWithAdjMatrix <- function(ts, n.0, m.0, timestamps) {
     
     n.max = ts + n.0  
     nodeList = seq(n.max)   ## Vector representing idx from 1..n.max
@@ -99,10 +63,26 @@ generateBarabasiAlbertModelWithAdjMatrix <- function(ts, n.0, m.0, timestamps) {
     n = n.0 + 1
     
     for(t in seq(ts)){
+        
+        shouldGetRandNodes <- TRUE
+        
+        while(shouldGetRandNodes){
+            selectedNodes <- getTwoRandomNodes(sum.kj, m.0, nodeList, n, k)
+            
+            n1 = selectedNodes[1]
+            n2 = selectedNodes[2]
+        
+            ## Not allowing multiedges and assuring the stub connects to two diff. nodes.
+            if(n1 != n2 & adj.mat[n, n1] == 0 & adj.mat[n, n2] == 0){
+                shouldGetRandNodes = FALSE
+            }
+        }
+        
         selectedNodes <- getTwoRandomNodes(sum.kj, m.0, nodeList, n, k)
         
         n1 = selectedNodes[1]
         n2 = selectedNodes[2]
+        
         
         # Add edges on adj.mat
         adj.mat[n, n1] <- 1
@@ -127,10 +107,10 @@ generateBarabasiAlbertModelWithAdjMatrix <- function(ts, n.0, m.0, timestamps) {
         
         if(t %in% timestamps){
             # Save degree sequence
-            #saveNodesDegreeOnFile(t, adj.mat, "BA_t_")
+            saveNodesDegreeOnFile(t, k, "BA_t_")
         }
     }
-    return(adj.mat)
+    return(k)
 }
 
 
@@ -148,9 +128,9 @@ runBarabasiAlbertModelConstruction <- function(t.max) {
   timestamps <- c(1, 10, 100, 1000, 10000, 50000, 80000)
   
   start = Sys.time()
-  adj.mat = generateBarabasiAlbertModel(t.max, n.0, m.0, timestamps)
+  k = generateBarabasiAlbertModel(t.max, n.0, m.0, timestamps)
   end = Sys.time()
-  saveNodesDegreeOnFile(t.max, adj.mat, "BA_t_")
+  saveNodesDegreeOnFile(t.max, k, "BA_t_")
   
   elapsedTime = end - start
   cat("Elasped time: ", elapsedTime, "\n")
@@ -158,7 +138,7 @@ runBarabasiAlbertModelConstruction <- function(t.max) {
 }
 
 
-t.max = 100000
+t.max = 10000
 
 if(APPLY_PROFILING){
     Rprof(tmp <- tempfile())
@@ -168,3 +148,5 @@ if(APPLY_PROFILING){
 } else {
     runBarabasiAlbertModelConstruction(t.max)
 }
+
+
