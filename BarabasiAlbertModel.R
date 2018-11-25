@@ -51,9 +51,9 @@ getTwoRandomNodes <- function(sum.kj, m.0, nodeList, n, k){
 
 
 
-generateBarabasiAlbertModel <- function(ts, n.0, m.0, timestamps) {
+generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
     
-    n.max = ts + n.0  
+    n.max = ts + n.0
     nodeList = seq(n.max)   ## Vector representing idx from 1..n.max
     k = rep(0, n.max)       ## Degrees of each node. Start on 0
     sum.kj = 0              ## Total sum of degrees
@@ -61,6 +61,11 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, timestamps) {
     adj.mat = Matrix(0, ncol = n.max, nrow = n.max, sparse=TRUE) 
     
     n = n.0 + 1
+    
+    v.track.1 <- c(0)
+    v.track.2 <- c(0)
+    v.track.3 <- c(0)
+    v.track.4 <- c(0)
     
     for(t in seq(ts)){
         
@@ -98,18 +103,29 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, timestamps) {
         k[n1] <- k[n1] + 1
         k[n2] <- k[n2] + 1
         
+        
+        # Keep track of our 4 vertices
+        v.track.1 <- append(v.track.1, k[v.track[1]])
+        v.track.2 <- append(v.track.2, k[v.track[2]])
+        v.track.3 <- append(v.track.3, k[v.track[3]])
+        v.track.4 <- append(v.track.4, k[v.track[4]])
+        
+        
+        # Increase n
         n = n + 1
         
         # Printing to keep track of the execution :)
         if(t%%100 == 0){
             cat("t: ", t,"\n")
         }
-        
-        if(t %in% timestamps){
-            # Save degree sequence
-            saveNodesDegreeOnFile(t, k, "BA_t_")
-        }
     }
+    
+    # Save 4 vertices tracking
+    saveNodesDegreeOnFile(v.track[1], v.track.1, "BA_v_")
+    saveNodesDegreeOnFile(v.track[2], v.track.2, "BA_v_")
+    saveNodesDegreeOnFile(v.track[3], v.track.3, "BA_v_")
+    saveNodesDegreeOnFile(v.track[4], v.track.4, "BA_v_")
+    
     return(k)
 }
 
@@ -125,16 +141,14 @@ runBarabasiAlbertModelConstruction <- function(t.max) {
     
   n.0 <- 3
   m.0 <- 2
-  timestamps <- c(1, 10, 100, 1000, 10000, 50000, 80000)
+  timestamps <- c(1, 10, 100, 1000) # 4 vertices to track
   
   start = Sys.time()
   k = generateBarabasiAlbertModel(t.max, n.0, m.0, timestamps)
   end = Sys.time()
-  saveNodesDegreeOnFile(t.max, k, "BA_t_")
   
   elapsedTime = end - start
   cat("Elasped time: ", elapsedTime, "\n")
-
 }
 
 
@@ -148,5 +162,11 @@ if(APPLY_PROFILING){
 } else {
     runBarabasiAlbertModelConstruction(t.max)
 }
+
+
+ks = read.csv2("BA_v_00001.csv")
+ks = as.vector(ks)
+plot(ks, ylab = "k", xlab = "Num of nodes", main="Degrees distribution")
+
 
 
