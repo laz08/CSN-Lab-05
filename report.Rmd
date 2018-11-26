@@ -31,6 +31,6 @@ We are going to discuss the results and the methods used, as well as cover the i
 ```{r echo=FALSE}
 plotAllEvolutions(table.BA)
 plotAllEvolutions(table.BA.Rand)
-
+plotAllEvolutions(table.BA.no.growth)
 ```
 
