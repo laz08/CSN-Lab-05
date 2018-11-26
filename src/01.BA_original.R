@@ -1,43 +1,18 @@
-# Load and install necessary packages
-requiredPackages <- c("igraph", "ggplot2", "Matrix", "ggthemes", "gridExtra")
-
-for (pac in requiredPackages) {
-    if(!require(pac,  character.only=TRUE)){
-        install.packages(pac, repos="http://cran.rstudio.com")
-        library(pac,  character.only=TRUE)
-    } 
-}
-rm(pac)
-rm(requiredPackages)
-
-
-# Set WD and load data
-wd = getwd()
-if(grepl("nora", wd)) {
-    setwd("~/Documents/18-19/CSN/LABS/05")
-} else {
-    # Set Piero Working directory
-    setwd("")
-}
-rm(wd)
-
+PREFIX = "../data/BA_growth_rand_v_"
 
 #################
-### Sourcing  ###
+### Variables ###
 #################
-source("commonFunctions.R")
-
-APPLY_PROFILING = FALSE
-LOAD_EXISTING_RUN = TRUE
-
-timestamps <- c(1, 10, 100, 1000) # 4 vertices to track
-
+filenamesBA <- c("../data/BA_v_00001.csv", 
+                          "../data/BA_v_00010.csv", 
+                          "../data/BA_v_00100.csv",
+                          "../data/BA_v_01000.csv")
 
 #################
 ### Functions ###
 #################
 
-getTwoRandomNodes <- function(sum.kj, m.0, nodeList, n, k){
+getTwoRandomNodesPreferentialAtt <- function(sum.kj, m.0, nodeList, n, k){
     
     n = n - 1
     
@@ -77,7 +52,7 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
         shouldGetRandNodes <- TRUE
         
         while(shouldGetRandNodes){
-            selectedNodes <- getTwoRandomNodes(sum.kj, m.0, nodeList, n, k)
+            selectedNodes <- getTwoRandomNodesPreferentialAtt(sum.kj, m.0, nodeList, n, k)
             
             n1 = selectedNodes[1]
             n2 = selectedNodes[2]
@@ -120,10 +95,10 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
     }
     
     # Save 4 vertices tracking
-    saveNodesDegreeOnFile(v.track[1], v.track.1, "BA_v_")
-    saveNodesDegreeOnFile(v.track[2], v.track.2, "BA_v_")
-    saveNodesDegreeOnFile(v.track[3], v.track.3, "BA_v_")
-    saveNodesDegreeOnFile(v.track[4], v.track.4, "BA_v_")
+    saveNodesDegreeOnFile(v.track[1], v.track.1, PREFIX)
+    saveNodesDegreeOnFile(v.track[2], v.track.2, PREFIX)
+    saveNodesDegreeOnFile(v.track[3], v.track.3, PREFIX)
+    saveNodesDegreeOnFile(v.track[4], v.track.4, PREFIX)
     
     return(k)
 }
@@ -133,10 +108,8 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
 #################
 ## Running code #
 #################
-#################
 
-
-runBarabasiAlbertModelConstruction <- function(t.max) {
+runBA <- function(t.max) {
     
   n.0 <- 3
   m.0 <- 2
@@ -151,48 +124,16 @@ runBarabasiAlbertModelConstruction <- function(t.max) {
 
 
 
-if(!LOAD_EXISTING_RUN){
-    t.max = 10000
+if(!LOAD_EXISTING_RUN_BA){
     
     if(APPLY_PROFILING){
         Rprof(tmp <- tempfile())
-        runBarabasiAlbertModelConstruction(t.max)
+        runBA(t.max)
         Rprof()
         summaryRprof(tmp)
     } else {
-        runBarabasiAlbertModelConstruction(t.max)
+        runBA(t.max)
     }
-} else {
-    ks.1 = read.csv2("BA_v_00001.csv"); ks.1 = ks.1$x
-    ks.2 = read.csv2("BA_v_00010.csv"); ks.2 = ks.2$x
-    ks.3 = read.csv2("BA_v_00100.csv"); ks.3 = ks.3$x
-    ks.4 = read.csv2("BA_v_01000.csv"); ks.4 = ks.4$x
-    
-    table = data.frame(sequ = seq(length(ks.1)), ks.1, ks.2, ks.3, ks.4)
 }
 
-
-
-plotVertexEvolution <- function(table, x, vid) {
-  
-  plot <- ggplot(data = table) +
-    aes(x = sequ, y = table[, x]) +
-    geom_point(color = '#0c4c8a') +
-    labs(title = paste('Vertex',vid, 'degree evolution'),
-      x = 't',
-      y = 'k') +
-    theme_calc()
-
-  return(plot)
-}
-
-
-
-plotAllEvolutions <- function(){
-    p1 <- plotVertexEvolution(table, 2, 1)
-    p2 <- plotVertexEvolution(table, 3, 10)
-    p3 <- plotVertexEvolution(table, 4, 100)
-    p4 <- plotVertexEvolution(table, 5, 1000)
-    grid.arrange(p1, p2, p3, p4, nrow=2, ncol=2)
-}
-   
+table.BA <- loadModelExecutions(filenamesBA)
