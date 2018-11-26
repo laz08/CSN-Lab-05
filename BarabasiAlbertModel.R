@@ -1,5 +1,5 @@
 # Load and install necessary packages
-requiredPackages <- c("igraph", "ggplot2", "Matrix")
+requiredPackages <- c("igraph", "ggplot2", "Matrix", "ggthemes", "gridExtra")
 
 for (pac in requiredPackages) {
     if(!require(pac,  character.only=TRUE)){
@@ -29,6 +29,10 @@ source("commonFunctions.R")
 
 APPLY_PROFILING = FALSE
 LOAD_EXISTING_RUN = TRUE
+
+timestamps <- c(1, 10, 100, 1000) # 4 vertices to track
+
+
 #################
 ### Functions ###
 #################
@@ -142,7 +146,6 @@ runBarabasiAlbertModelConstruction <- function(t.max) {
     
   n.0 <- 3
   m.0 <- 2
-  timestamps <- c(1, 10, 100, 1000) # 4 vertices to track
   
   start = Sys.time()
   k = generateBarabasiAlbertModel(t.max, n.0, m.0, timestamps)
@@ -175,15 +178,28 @@ if(!LOAD_EXISTING_RUN){
 }
 
 
-library("esquisse")
-esquisser(viewer = "browser")
-library("ggplot2")
-library("ggthemes")
 
-ggplot(data = table) +
-  aes(x = sequ, y = ks.1) +
-  geom_point(color = '#0c4c8a') +
-  labs(title = 'Vertex 1 degree evolution',
-    x = 't',
-    y = 'k') +
-  theme_calc()
+plotVertexEvolution <- function(table, x, vid) {
+  
+  plot <- ggplot(data = table) +
+    aes(x = sequ, y = table[, x]) +
+    geom_point(color = '#0c4c8a') +
+    labs(title = paste('Vertex',vid, 'degree evolution'),
+      x = 't',
+      y = 'k') +
+    theme_calc()
+
+  return(plot)
+}
+
+
+
+plotAllEvolutions <- function(){
+    p1 <- plotVertexEvolution(table, 2, 1)
+    p2 <- plotVertexEvolution(table, 3, 10)
+    p3 <- plotVertexEvolution(table, 4, 100)
+    p4 <- plotVertexEvolution(table, 5, 1000)
+    grid.arrange(p1, p2, p3, p4, nrow=2, ncol=2)
+}
+
+plotAllEvolutions()    
