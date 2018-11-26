@@ -87,13 +87,7 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
                 shouldGetRandNodes = FALSE
             }
         }
-        
-        selectedNodes <- getTwoRandomNodes(sum.kj, m.0, nodeList, n, k)
-        
-        n1 = selectedNodes[1]
-        n2 = selectedNodes[2]
-        
-        
+       
         # Add edges on adj.mat
         adj.mat[n, n1] <- 1
         adj.mat[n1, n] <- 1
@@ -107,7 +101,7 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
         ## Increase degree of each vertice
         k[n1] <- k[n1] + 1
         k[n2] <- k[n2] + 1
-        
+        k[n] <- k[n] + 1
         
         # Keep track of our 4 vertices
         v.track.1 <- append(v.track.1, k[v.track[1]])
@@ -201,5 +195,4 @@ plotAllEvolutions <- function(){
     p4 <- plotVertexEvolution(table, 5, 1000)
     grid.arrange(p1, p2, p3, p4, nrow=2, ncol=2)
 }
-
-plotAllEvolutions()    
+   
