@@ -46,6 +46,3 @@ source("commonFunctions.R")
 source("01.BA_original.R")
 source("02.BA_growth_rand_att.R")
 source("03.BA_no_growth.R")
-
-plotAllEvolutions(table.BA)
-plotAllEvolutions(table.BA.Rand)

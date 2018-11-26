@@ -23,12 +23,12 @@ plotVertexEvolution <- function(table, x, vid) {
 }
 
 
-plotAllEvolutions <- function(table){
+plotAllEvolutions <- function(table, title){
     p1 <- plotVertexEvolution(table, 2, 1)
     p2 <- plotVertexEvolution(table, 3, 10)
     p3 <- plotVertexEvolution(table, 4, 100)
     p4 <- plotVertexEvolution(table, 5, 1000)
-    grid.arrange(p1, p2, p3, p4, nrow=2, ncol=2)
+    grid.arrange(p1, p2, p3, p4, nrow=2, ncol=2, top=title)
 }
 
 

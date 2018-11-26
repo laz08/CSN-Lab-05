@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 options(scipen=999)
 ```
 
-```{r cache=FALSE, echo=FALSE}
+```{r cache=FALSE, echo=FALSE, include=FALSE}
 source("src/00.modelsComparison.R")
 ```
 # Introduction
@@ -29,8 +29,8 @@ We are going to discuss the results and the methods used, as well as cover the i
 # Results
 
 ```{r echo=FALSE}
-plotAllEvolutions(table.BA)
-plotAllEvolutions(table.BA.Rand)
-plotAllEvolutions(table.BA.no.growth)
+plotAllEvolutions(table.BA, "B.A.: Growth + Preferential attachment")
+plotAllEvolutions(table.BA.Rand, "B.A.: Growth + Random attachment")
+plotAllEvolutions(table.BA.no.growth, "B.A.: No Growth + Preferential attachment")
 ```
 
