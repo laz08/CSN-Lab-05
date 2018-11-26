@@ -11,7 +11,7 @@ options(scipen=999)
 ```
 
 ```{r cache=FALSE, echo=FALSE}
-source("BarabasiAlbertModel.R")
+source("src/00.modelsComparison.R")
 ```
 # Introduction
 
@@ -29,6 +29,8 @@ We are going to discuss the results and the methods used, as well as cover the i
 # Results
 
 ```{r echo=FALSE}
-plotAllEvolutions()
+plotAllEvolutions(table.BA)
+plotAllEvolutions(table.BA.Rand)
+
 ```
 
