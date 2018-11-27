@@ -54,6 +54,6 @@ if(TESTING){
     theoretic_ki = c()
     m.0 = 2
     for (t in seq(t.max+1)) {
-        theoretic_ki = append(theoretic_ki, (m.0*(t**(0.5))))
+        theoretic_ki = append(theoretic_ki, (m.0*((t.max/t)**0.5)))
     }
 }
