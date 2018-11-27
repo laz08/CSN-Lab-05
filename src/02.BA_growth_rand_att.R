@@ -26,8 +26,6 @@ generateBarabasiAlbertModelRandAttachment <- function(ts, n.0, m.0, v.track) {
     n.max = ts + n.0
     nodeList = seq(n.max)   ## Vector representing idx from 1..n.max
     k = rep(0, n.max)       ## Degrees of each node. Start on 0
-
-    adj.mat = Matrix(0, ncol = n.max, nrow = n.max, sparse=TRUE) 
     
     n = n.0 + 1
     
@@ -47,17 +45,12 @@ generateBarabasiAlbertModelRandAttachment <- function(ts, n.0, m.0, v.track) {
             n2 = selectedNodes[2]
             
             ## Not allowing multiedges and assuring the stub connects to two diff. nodes.
-            if(n1 != n2 & adj.mat[n, n1] == 0 & adj.mat[n, n2] == 0){
-                shouldGetRandNodes <- FALSE
+            if(n1 == n2){
+                shouldGetRandNodes = TRUE
+            } else{
+                shouldGetRandNodes = FALSE
             }
         }
-        
-        # Add edges on adj.mat
-        adj.mat[n, n1] <- 1
-        adj.mat[n1, n] <- 1
-        
-        adj.mat[n, n2] <- 1
-        adj.mat[n2, n] <- 1
         
         
         ## Increase degree of each vertice
@@ -67,10 +60,10 @@ generateBarabasiAlbertModelRandAttachment <- function(ts, n.0, m.0, v.track) {
         
         
         # Keep track of our 4 vertices
-        v.track.1 <- append(v.track.1, k[v.track[1]])
-        v.track.2 <- append(v.track.2, k[v.track[2]])
-        v.track.3 <- append(v.track.3, k[v.track[3]])
-        v.track.4 <- append(v.track.4, k[v.track[4]])
+        v.track.1 <- append(v.track.1, k[v.track[1] + n.0])
+        v.track.2 <- append(v.track.2, k[v.track[2] + n.0])
+        v.track.3 <- append(v.track.3, k[v.track[3] + n.0])
+        v.track.4 <- append(v.track.4, k[v.track[4] + n.0])
         
         
         # Increase n

@@ -37,7 +37,7 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
     k = rep(0, n.max)       ## Degrees of each node. Start on 0
     sum.kj = 0              ## Total sum of degrees
     
-    adj.mat = Matrix(0, ncol = n.max, nrow = n.max, sparse=TRUE) 
+
     
     n = n.0 + 1
     
@@ -64,12 +64,6 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
             }
         }
        
-        # Add edges on adj.mat
-        adj.mat[n, n1] <- 1
-        adj.mat[n1, n] <- 1
-        
-        adj.mat[n, n2] <- 1
-        adj.mat[n2, n] <- 1
         
         ## Add num. of edges + 1 added on each it to the total sum
         ## Which is the increase of degree for each iteration
