@@ -78,13 +78,13 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
         ## Increase degree of each vertice
         k[n1] <- k[n1] + 1
         k[n2] <- k[n2] + 1
-        k[n] <- k[n] + 1
+        k[n] <- k[n] + 2
         
         # Keep track of our 4 vertices
-        v.track.1 <- append(v.track.1, k[v.track[1]])
-        v.track.2 <- append(v.track.2, k[v.track[2]])
-        v.track.3 <- append(v.track.3, k[v.track[3]])
-        v.track.4 <- append(v.track.4, k[v.track[4]])
+        v.track.1 <- append(v.track.1, k[v.track[1] + n.0])
+        v.track.2 <- append(v.track.2, k[v.track[2] + n.0])
+        v.track.3 <- append(v.track.3, k[v.track[3] + n.0])
+        v.track.4 <- append(v.track.4, k[v.track[4] + n.0])
         
         
         # Increase n
@@ -113,7 +113,7 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
 
 runBA <- function(t.max) {
     
-  n.0 <- 2
+  n.0 <- 3
   m.0 <- 2
   
   start = Sys.time()
@@ -122,6 +122,7 @@ runBA <- function(t.max) {
   
   elapsedTime = end - start
   cat("Elasped time: ", elapsedTime, "\n")
+  return(k)
 }
 
 
@@ -134,8 +135,9 @@ if(!LOAD_EXISTING_RUN_BA){
         Rprof()
         summaryRprof(tmp)
     } else {
-        runBA(t.max)
+        final.k = runBA(t.max)
     }
 }
 
 table.BA <- loadModelExecutions(filenamesBA)
+tail(table.BA)
