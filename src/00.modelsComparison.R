@@ -32,6 +32,9 @@ LOAD_EXISTING_RUN_BA_RAND = TRUE
 LOAD_EXISTING_RUN_BA_NO_GROWTH = TRUE
 
 
+
+TESTING = TRUE
+
 #################
 ### Variables ###
 #################
@@ -46,3 +49,11 @@ source("commonFunctions.R")
 source("01.BA_original.R")
 source("02.BA_growth_rand_att.R")
 source("03.BA_no_growth.R")
+
+if(TESTING){
+    theoretic_ki = c()
+    m.0 = 2
+    for (t in seq(t.max+1)) {
+        theoretic_ki = append(theoretic_ki, (m.0*(t**(0.5))))
+    }
+}

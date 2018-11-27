@@ -1,4 +1,4 @@
-PREFIX = "../data/BA_growth_rand_v_"
+PREFIX = "../data/BA_v_"
 
 #################
 ### Variables ###
@@ -21,8 +21,7 @@ getTwoRandomNodesPreferentialAtt <- function(sum.kj, m.0, nodeList, n, k){
         pi.k = rep(1, n)
     } else {
         # Compute probs.
-        ## Adding offset so everyone has a chance to be selected
-        pi.k = (k[1:n]/sum.kj) + 0.1
+        pi.k = (k[1:n]/sum.kj)
     }
     selectedNodes <- sample(nodeList[1:n], m.0, prob = pi.k)
     return(selectedNodes)
@@ -30,7 +29,7 @@ getTwoRandomNodesPreferentialAtt <- function(sum.kj, m.0, nodeList, n, k){
 
 
 
-
+# TODO: This is hardcoded for only  m.0!! Change!!
 generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
     
     n.max = ts + n.0
@@ -58,7 +57,9 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
             n2 = selectedNodes[2]
         
             ## Not allowing multiedges and assuring the stub connects to two diff. nodes.
-            if(n1 != n2 & adj.mat[n, n1] == 0 & adj.mat[n, n2] == 0){
+            if(n1 == n2){
+                shouldGetRandNodes = TRUE
+            } else{
                 shouldGetRandNodes = FALSE
             }
         }
@@ -70,8 +71,9 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
         adj.mat[n, n2] <- 1
         adj.mat[n2, n] <- 1
         
-        ## Add num. of edges added on each it to the total sum
-        sum.kj <- sum.kj + m.0
+        ## Add num. of edges + 1 added on each it to the total sum
+        ## Which is the increase of degree for each iteration
+        sum.kj <- sum.kj + (m.0 + 1)
         
         ## Increase degree of each vertice
         k[n1] <- k[n1] + 1
@@ -111,7 +113,7 @@ generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
 
 runBA <- function(t.max) {
     
-  n.0 <- 3
+  n.0 <- 2
   m.0 <- 2
   
   start = Sys.time()
