@@ -1,3 +1,4 @@
+rm(list = ls())
 # Load and install necessary packages
 requiredPackages <- c("igraph", "ggplot2", "Matrix", "ggthemes", "gridExtra")
 
@@ -90,43 +91,63 @@ t = seq(t.max+1)
 # models without intercept
 model0 = nls(theoretic_ki~a*t,start=list(a=1))
 model1 = nls(theoretic_ki~a*sqrt(t),start=list(a=1))
-model2 = nls(theoretic_ki~a*(t)^b, start = list(a=0.1, b=0.1), control = nls.control(tol = 1e-1 ))
+model2 = nls(theoretic_ki~a*(t)^b, start = list(a=0.1, b=0.1), 
+             control = nls.control(tol = 1e-1 ))
 model3 = nls(theoretic_ki~a*exp(c*t), start = list(a=1,c=0.0001))
-model4 = nls(theoretic_ki~a*(log(abs(t+d1))), start=list(a=0.1 ,d1=1), control = nls.control(tol = 0.7))
+model4 = nls(theoretic_ki~a*(log(abs(t+d1))), start=list(a=0.1 ,d1=1), 
+             control = nls.control(tol = 0.7))
 
 # models with intercept
 model0i = nls(theoretic_ki~a*t+d,start=list(a=1, d=1))
 model1i = nls(theoretic_ki~a*sqrt(t)+d,start=list(a=1, d=1))
-model2i = nls(theoretic_ki~a*((t)^b)+d, start = list(a=0.1, b=0.1, d=0.1), algorithm = "port")
+model2i = nls(theoretic_ki~a*((t)^b)+d, start = list(a=0.1, b=1, d=1),
+              control = nls.control(maxiter = 100, tol = 2))
 model3i = nls(theoretic_ki~d+a*exp(c*t), start = list(a=1,c=0.001, d=0.1),
-            control = nls.control(maxiter = 100, tol=0.4))
-model4i = nls(theoretic_ki~a*(log(abs(t+d1)))+d2, start=list(a=0.1 ,d1=1, d2=1), control = nls.control(tol = 0.7))
+              control = nls.control(maxiter = 100, tol=0.4))
+model4i = nls(theoretic_ki~a*(log(abs(t+d1)))+d2, start=list(a=0.1 ,d1=1, d2=1), 
+              control = nls.control(tol = 0.7))
 
-wt_inter = list(model0, model1, model2, model3, model4)
-w_inter = list(model0i, model1i, model2i, model3i, model4i)
+# the models computer are now inserted in a list to write to compact the code
+models_list = list(model0, model1, model2, model3, model4,
+                   model0i, model1i, model2i, model3i, model4i)
 
-# get the sum of residuals squared of the models and the aic value for a model
+# get the sum of residuals squared of the models,the aic value and the parmeters found
 get_RSS = function(x) return(sum(theoretic_ki-predict(x))^2)
 get_AIC = function(rss, par) return(t.max*log(2*pi) + t.max*log(rss/t.max) + t.max + 2*(par + 1))
 get_params = function(x) return(as.vector(summary(x)$parameters[,1]))
 
 # parameters of each model
-mod_params = c(1,1,2,2,2)
+mod_params = c(1, 1, 2, 2, 2, 2, 2, 3, 3, 3)
 # get parameter estimate from models..
-pm = lapply(wt_inter, get_params)
-# replace missing parameters with NA (some models have 1 params others 2)..
+pm = lapply(models_list, get_params)
+# replace missing parameters with NA (some models have 1 params others 2, others 3)..
 pm = lapply(pm, `length<-`, max(lengths(pm)))
-# transform it in matrix..
+# transform it into matrix to append in the dataframe
 pm = do.call(rbind, pm)
+
 # residual sum of squares
-rss = sapply(wt_inter, get_RSS)
-rss_i = sapply(w_inter, get_RSS)
+rss = sapply(models_list, get_RSS)
+
 # Akaike information criterion
 aic_vect = mapply(get_AIC,rss, mod_params)
-aic_vect_i = mapply(get_AIC, rss_i, mod_params+1) #+1 because all the models have now the intercept
-
 
 # model selection growth + preferential attachment 
-ms_gp = data.frame("RSS no inter"= rss, "AIC no inter"=aic_vect, "RSS inter"=rss_i, "AIC inter"= aic_vect_i)
-rownames(ms_gp) = c("linear regr", "plaw 0.5", "plaw", "expo", "log")
-ms_gp[which.min(ms_gp$AIC.no.inter),]
+ms_gp = data.frame("RSS"= rss,      # residual square of sum no intercept
+                   "AIC"=aic_vect,  # aic no intercept
+                   "Param1"=pm[,1],          # param 1
+                   "Param2"=pm[,2],          # param 2
+                   "Param3"=pm[,3])          # param 
+# add model names to df
+rownames(ms_gp) = c("linear regr", "plaw 0.5", "plaw", "expo", "log",
+                    "linear regr+i", "plaw 0.5+i", "plaw+i", "expo+i", "log+i")
+
+# show the one that fit better
+ms_gp[which.min(ms_gp$AIC),]
+
+a = ms_gp["plaw","Param1"]
+c = ms_gp["plaw","Param2"]
+plot(theoretic_ki, xlim = c(0,500), main = "Fitting best model found", xlab = "t", ylab = "k(t)")
+curve(200*exp(c*x), col="red", add = TRUE, lwd = 2)
+legend("topright", legend = c("Empirical k_i", "Best fitting"),
+       lty = 1, col = c("black", "red"))
+
