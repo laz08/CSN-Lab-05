@@ -8,7 +8,7 @@ filenamesBA.Rand.Att <- c("../data/BA_growth_rand_v_00001.csv",
                           "../data/BA_growth_rand_v_00100.csv",
                           "../data/BA_growth_rand_v_01000.csv")
 
-
+filenameBA.Rand.Att.Final <- "../data/BA_growth_rand_v_10000.csv"
 #################
 ### Functions ###
 #################
@@ -56,7 +56,7 @@ generateBarabasiAlbertModelRandAttachment <- function(ts, n.0, m.0, v.track) {
         ## Increase degree of each vertice
         k[n1] <- k[n1] + 1
         k[n2] <- k[n2] + 1
-        k[n] <- k[n] + 1
+        k[n] <- k[n] + m.0
         
         
         # Keep track of our 4 vertices
@@ -80,7 +80,7 @@ generateBarabasiAlbertModelRandAttachment <- function(ts, n.0, m.0, v.track) {
     saveNodesDegreeOnFile(v.track[2], v.track.2, PREFIX)
     saveNodesDegreeOnFile(v.track[3], v.track.3, PREFIX)
     saveNodesDegreeOnFile(v.track[4], v.track.4, PREFIX)
-    
+
     return(k)
 }
 
@@ -102,6 +102,8 @@ runBA.Rand.Attach <- function(t.max) {
     
     elapsedTime = end - start
     cat("Elasped time: ", elapsedTime, "\n")
+    
+    return(k)
 }
 
 
@@ -109,11 +111,12 @@ runBA.Rand.Attach <- function(t.max) {
 if(!LOAD_EXISTING_RUN_BA_RAND){
     if(APPLY_PROFILING){
         Rprof(tmp <- tempfile())
-        runBA.Rand.Attach(t.max)
+        final.k =runBA.Rand.Attach(t.max)
         Rprof()
         summaryRprof(tmp)
     } else {
-        runBA.Rand.Attach(t.max)
+        final.k = runBA.Rand.Attach(t.max)
+        saveNodesDegreeOnFile(t.max, final.k, PREFIX)
     }
 } 
 

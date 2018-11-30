@@ -8,6 +8,8 @@ filenamesBA.no.growth <- c("../data/BA_no_growth_v_00001.csv",
                  "../data/BA_no_growth_v_00100.csv",
                  "../data/BA_no_growth_v_01000.csv")
 
+filename.final.BA.no.growth <- "../data/BA_no_growth_v_10000.csv"
+
 #################
 ### Functions ###
 #################
@@ -73,7 +75,7 @@ generateBarabasiAlbertModelNoGrowth <- function(ts, n.0, m.0, v.track) {
         ## Increase degree of each vertice
         k[n1] <- k[n1] + 1
         k[n2] <- k[n2] + 1
-        k[n] <- k[n] + 1
+        k[n] <- k[n] + m.0
         
         # Keep track of our 4 vertices
         v.track.1 <- append(v.track.1, k[v.track[1]])
@@ -96,7 +98,7 @@ generateBarabasiAlbertModelNoGrowth <- function(ts, n.0, m.0, v.track) {
     saveNodesDegreeOnFile(v.track[2], v.track.2, PREFIX)
     saveNodesDegreeOnFile(v.track[3], v.track.3, PREFIX)
     saveNodesDegreeOnFile(v.track[4], v.track.4, PREFIX)
-    
+
     return(k)
 }
 
@@ -117,6 +119,8 @@ runBANoGrowth <- function(t.max) {
     
     elapsedTime = end - start
     cat("Elasped time: ", elapsedTime, "\n")
+    
+    return(k)
 }
 
 
@@ -129,7 +133,8 @@ if(!LOAD_EXISTING_RUN_BA_NO_GROWTH){
         Rprof()
         summaryRprof(tmp)
     } else {
-        runBANoGrowth(t.max)
+        final.k = runBANoGrowth(t.max)
+        saveNodesDegreeOnFile(t.max, final.k, PREFIX)
     }
 }
 
