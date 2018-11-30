@@ -151,3 +151,8 @@ curve(200*exp(c*x), col="red", add = TRUE, lwd = 2)
 legend("topright", legend = c("Empirical k_i", "Best fitting"),
        lty = 1, col = c("black", "red"))
 
+
+## Final degrees sequence
+final.BA.seq <- read.csv2(filenameBAFinal); final.BA.seq <- final.BA.seq$x
+final.BA.Rand.Att.seq <- read.csv2(filenameBA.Rand.Att.Final); final.BA.Rand.Att.seq <- final.BA.Rand.Att.seq$x
+final.BA.no.growth.seq <- read.csv2(filename.final.BA.no.growth); final.BA.no.growth.seq <- final.BA.no.growth.seq$x
