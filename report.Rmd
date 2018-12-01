@@ -7,6 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library("knitr")
 options(scipen=999)
 ```
 
@@ -43,26 +44,44 @@ In the third case, B.A.'' (No growth + preferential attachment), we start with 1
 
 In those 2 cases where preferential attachment is what determines where each edge from the stub connects to, the higher the number of edges an existing node has, the higher the probability it has to be the one selected for the new addition.
 
-In the first model and second model we do not have to worry on whether we are creating multiedges or not, for each stub is added in every iteration and it cannot select itself.
+In the first model and second model we do not have to worry on whether we are creating multiedges or not, for each stub is added in every iteration and it cannot select itself. Because of this, we have not used an adjacency matrix and only have tracked the degree evolution of 4 selected nodes, as well as the global degree sequence when reaching $t_{max}$.
 
+However, to avoid having multi-edges on the third model, we have used a sparse adjacency matrix to check whether an edge existed or not before adding it or not. The sparse decision has been taken in order to be more lenient on our computer memories. The usage of such matrix makes the execution of this simulation a little bit slower compared to the other ones.
 
+Below is a table that represents on average the time it has taken us to execute the three simulations:
+```{r echo=FALSE}
+times = c(5, 3, 40)
+names = c("B.A.", "B.A.'", "B.A.''")
+times.df = data.frame(names, times)
+kable(times.df, caption = "Elapsed times on simulation runs", col.names = c("Simulation", "$\\Delta t (seconds)$ "))
+```
 
 # Results
 Now we are going to see how is the evolution of 4 vertices until reaching $t_{max}$, as well as what distribution better fits each model.
 
+
 ## Evolution
 
-```{r  echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert (Growth + Preferential attachment) evolution for 4 vertices"}
+```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert (Growth + Preferential attachment) evolution for 4 vertices"}
 plotAllEvolutions(table.BA, "B.A.: Growth + Preferential attachment")
 ```
 
 
-```{r  echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert' (Growth + Random attachment) evolution for 4 vertices"}
+```{r cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert' (Growth + Random attachment) evolution for 4 vertices"}
 plotAllEvolutions(table.BA.Rand, "B.A.': Growth + Random attachment")
 ```
 
 
 
-```{r  echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert\'\' (No Growth + Preferential attachment) evolution for 4 vertices"}
+```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert\'\' (No Growth + Preferential attachment) evolution for 4 vertices"}
 plotAllEvolutions(table.BA.no.growth, "B.A.'': No Growth + Preferential attachment")
 ```
+
+
+# Conclusions
+
+We can see how x model fits ...
+
+Some possible future work would be to see whether the best fitting distributions change when $$n_{0} \gt 3$$ and $$m_{0} \gt 2$$
+
+Since we have not had enough time to perform these tests, we have made these two parameters static. It would be interesting to see the effects on changing them.
