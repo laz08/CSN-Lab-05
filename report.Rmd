@@ -7,6 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library("knitr")
 options(scipen=999)
 ```
 
@@ -15,7 +16,7 @@ source("src/00.modelsComparison.R")
 ```
 # Introduction
 
-In this delivery we are asked to simulate three network growth models and study them from a statistical perspective. 
+In this delivery we are asked to simulate three network growth models and study them from a statistical point of view. 
 
 The first one is the original Barabasi Albert model, and the other two are based on this one with some variations:
 
@@ -25,12 +26,62 @@ The first one is the original Barabasi Albert model, and the other two are based
 
 We are going to discuss the results and the methods used, as well as cover the implementation done and problems encountered.
 
+# Implementation
 
-# Results
+As asked, we have implemented the simulation on these three models with a fixed $n_{0}$, $m_{0}$ and  $t_{max}$, their values being:
 
+- $n_{0} = 3$
+- $m_{0} = 2$
+- $t_{max} = 10.000$
+
+This means that for the models with growth (B.A. and B.A.'), on $t = 0$, there will exist 3 nodes fully connected. Meaning we are starting with a fully connected graph. This decision is taken in order to avoid ending up with a disconnected graph, since if we start with a disconnected graph, after the first iteration has been performed, the non-selected node will never be selected and thus we will end up with a disconnected node from the overall graph.
+
+Each time $t$ increases on every iteration, a stub is going to be added. Each stub will consist on a node with $m_{0}$ edges. In our case, $m_{0} = 2$, so each iteration we are going to add two edges to the graph.
+
+This will be performed until reaching $t_{max}$, when the total number of nodes $N$ will be $$N = n_{0} + t_{max} = 3 + 10.000 = 10.003$$
+
+In the third case, B.A.'' (No growth + preferential attachment), we start with 10.000 nodes and end with the same number of nodes.
+
+In those 2 cases where preferential attachment is what determines where each edge from the stub connects to, the higher the number of edges an existing node has, the higher the probability it has to be the one selected for the new addition.
+
+In the first model and second model we do not have to worry on whether we are creating multiedges or not, for each stub is added in every iteration and it cannot select itself. Because of this, we have not used an adjacency matrix and only have tracked the degree evolution of 4 selected nodes, as well as the global degree sequence when reaching $t_{max}$.
+
+However, to avoid having multi-edges on the third model, we have used a sparse adjacency matrix to check whether an edge existed or not before adding it or not. The sparse decision has been taken in order to be more lenient on our computer memories. The usage of such matrix makes the execution of this simulation a little bit slower compared to the other ones.
+
+Below is a table that represents on average the time it has taken us to execute the three simulations:
 ```{r echo=FALSE}
-plotAllEvolutions(table.BA, "B.A.: Growth + Preferential attachment")
-plotAllEvolutions(table.BA.Rand, "B.A.: Growth + Random attachment")
-plotAllEvolutions(table.BA.no.growth, "B.A.: No Growth + Preferential attachment")
+times = c(5, 3, 40)
+names = c("B.A.", "B.A.'", "B.A.''")
+times.df = data.frame(names, times)
+kable(times.df, caption = "Elapsed times on simulation runs", col.names = c("Simulation", "$\\Delta t (seconds)$ "))
 ```
 
+# Results
+Now we are going to see how is the evolution of 4 vertices until reaching $t_{max}$, as well as what distribution better fits each model.
+
+
+## Evolution
+
+```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert (Growth + Preferential attachment) evolution for 4 vertices"}
+plotAllEvolutions(table.BA, "B.A.: Growth + Preferential attachment")
+```
+
+
+```{r cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert' (Growth + Random attachment) evolution for 4 vertices"}
+plotAllEvolutions(table.BA.Rand, "B.A.': Growth + Random attachment")
+```
+
+
+
+```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert\'\' (No Growth + Preferential attachment) evolution for 4 vertices"}
+plotAllEvolutions(table.BA.no.growth, "B.A.'': No Growth + Preferential attachment")
+```
+
+
+# Conclusions
+
+We can see how x model fits ...
+
+Some possible future work would be to see whether the best fitting distributions change when $$n_{0} \gt 3$$ and $$m_{0} \gt 2$$
+
+Since we have not had enough time to perform these tests, we have made these two parameters static. It would be interesting to see the effects on changing them.

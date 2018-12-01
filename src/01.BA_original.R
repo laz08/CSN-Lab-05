@@ -18,28 +18,26 @@ getTwoRandomNodesPreferentialAtt <- function(sum.kj, m.0, nodeList, n, k){
     
     n = n - 1
     
-    if(sum.kj == 0){
-        # First iteration, disconnected graph
-        pi.k = rep(1, n)
-    } else {
-        # Compute probs.
-        pi.k = (k[1:n]/sum.kj)
-    }
+    # Compute probs.
+    pi.k = (k[1:n]/sum.kj)
+
     selectedNodes <- sample(nodeList[1:n], m.0, prob = pi.k)
     return(selectedNodes)
 }
 
 
 
-# TODO: This is hardcoded for only  m.0!! Change!!
+# TODO: This code only takes into account having m.0 = 2. This should be abstracted.
 generateBarabasiAlbertModel <- function(ts, n.0, m.0, v.track) {
     
     n.max = ts + n.0
     nodeList = seq(n.max)   ## Vector representing idx from 1..n.max
     k = rep(0, n.max)       ## Degrees of each node. Start on 0
-    sum.kj = 0              ## Total sum of degrees
     
-
+    sum.kj = 3              ## Total sum of degrees. We start with 3.
+    k[1] = 1                ## so we have a fully connected graph
+    k[2] = 1                ## to avoid having a disconnected node.
+    k[3] = 1
     
     n = n.0 + 1
     
