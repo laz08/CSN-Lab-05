@@ -1,7 +1,7 @@
 rm(list = ls())
 # Load and install necessary packages
 requiredPackages <- c("igraph", "ggplot2", "Matrix", "ggthemes", "gridExtra",
-                      "minpack.lm")
+                      "minpack.lm", "stats4", "VGAM")
 
 for (pac in requiredPackages) {
     if(!require(pac,  character.only=TRUE)){
@@ -52,104 +52,77 @@ source("01.BA_original.R")
 source("02.BA_growth_rand_att.R")
 source("03.BA_no_growth.R")
 
+
 m.0 = 2
-# if(TESTING){
-#    theoretic_ki = c()
-#    exact_scaled_therotic_ki = c()
-#    # approximated vertex degree over time (slide 4)
-#    approx_scaled_therotic_ki = rep(m.0*sqrt(t.max), t.max+1)
-#    m.0 = 2
-#    for (t in seq(t.max+1)) {
-#       # vertex degree over time (slide 4)
-#       theoretic_ki = append(theoretic_ki, (m.0*((t.max/t)**0.5)))
-#       # scaled vertex degree over time (slide 4)
-#       exact_scaled_therotic_ki = append(exact_scaled_therotic_ki, 
-#                                         sqrt(t)*theoretic_ki[t])
-#       
-#    }
-# }
+n.0 = 3
 
 
-test = as.data.frame(cbind(table.BA[,-1],
-                           table.BA.no.growth[,-1],
-                           table.BA.Rand[,-1]))
 
-# model selection ---------------------------------------------------------
+# Vertex Growth -----------------------------------------------------------
 
 # sequence of values
 t = seq(t.max+1)
-# get the sum of residuals squared of the models,the aic value and the parmeters found
 
-# parameters of each model
-mod_params = c(1, 1, 2, 2, 2, 2, 2, 3, 3, 3)
 
-prova = function(i){
-   
-# models without intercept
-model0 = nlsLM(i ~ a*t, start=list(a=1))
-model1 = nlsLM(i ~ a*sqrt(t),start=list(a=1))
-model2 = nlsLM(i ~ a*(t)^b, start = list(a=0.1, b=1))
-model3 = nlsLM(i ~ a*exp(c*t), start = list(a=1,c=0.0001))
-model4 = nlsLM(i ~ a*(log(abs(t+d1))), start=list(a=0.1 ,d1=1))
+suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth)))
+plot_ki(table.BA, "topleft", "gp") # growth preferential
 
-# models with intercept
-model0i = nlsLM(i ~ a*t+d,start=list(a=1, d=1))
-model1i = nlsLM(i ~ a*sqrt(t)+d,start=list(a=1, d=1))
-model2i = nlsLM(i ~ a*((t)^b)+d, start = list(a=0.1, b=1, d=1), control=nls.lm.control(maxiter = 150))
-model3i = nlsLM(i ~ d+a*exp(c*t), start = list(a=1,c=0.01, d=0.1))
-model4i = nlsLM(i ~ a*(log(abs(t+d1)))+d2, start=list(a=10 ,d1=1000, d2=-100))
+suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth)))
+plot_ki(table.BA.no.growth, "bottomright", "gr") # growth random
 
-# the models computer are now inserted in a list to compact the code
-models_list = list(model0, model1, model2, model3, model4,
-                   model0i, model1i, model2i, model3i, model4i)
+suppressWarnings(do.call(rbind, apply(table.BA.no.growth[,-1],2, model_selection_vertex_growth)))
+plot_ki(table.BA.Rand, "bottomright", "ngp") # no growth preferential
 
-get_RSS = function(x) return(sum(i-predict(x))^2) #check
-get_AIC = function(rss, par) return(t.max*log(2*pi) + t.max*log(rss/t.max) + t.max + 2*(par + 1))
-get_params = function(x) return(as.vector(summary(x)$coefficients[,1]))
 
-# get parameter estimate from models..
-pm = lapply(models_list, get_params)
-# replace missing parameters with NA (some models have 1 params others 2, others 3)..
-pm = lapply(pm, `length<-`, max(lengths(pm)))
-# transform it into matrix to append in the dataframe
-pm = do.call(rbind, pm)
 
-# residual sum of squares
-rss = sapply(models_list, get_RSS)
-
-# Akaike information criterion
-aic_vect = mapply(get_AIC,rss, mod_params)
-
-model_name = c("linear regr", "plaw 0.5", "plaw", "expo", "log",
-                    "linear regr+i", "plaw 0.5+i", "plaw+i", "expo+i", "log+i")
-# model selection growth + preferential attachment 
-ms_gp = data.frame("Model" = model_name,
-                   "RSS"= rss,      # residual square of sum no intercept
-                   "AIC"=aic_vect,  # aic no intercept
-                   "Param1"=pm[,1],          # param 1
-                   "Param2"=pm[,2],          # param 2
-                   "Param3"=pm[,3])          # param 
-# add model names to df
-
-# show the one that fit better
-better_fit = ms_gp[which.min(ms_gp$AIC),]
-
-}
-
-df = do.call(rbind, apply(test,2, prova))
-
-a = as.numeric(better_fit["Param1"])
-b = as.numeric(better_fit["Param2"])
-
-plot(table.BA$ks.2,main = "Fitting best model found", ylim = c(1,200), xlab = "t", ylab = "k(t)")
-curve(0.0006748097*x+6.963243, col="red", add = TRUE, lwd = 2)
-curve(2*sqrt(x), col="green", add = TRUE, lwd=2)
-legend("bottomright", legend = c("Empirical k_i", "Best fitting"),
-       lty = 1, col = c("black", "red"))
+# Degree Distribution -----------------------------------------------------
 
 
 ## Final degrees sequence
 final.BA.seq <- read.csv2(filenameBAFinal); final.BA.seq <- final.BA.seq$x
 final.BA.Rand.Att.seq <- read.csv2(filenameBA.Rand.Att.Final); final.BA.Rand.Att.seq <- final.BA.Rand.Att.seq$x
 final.BA.no.growth.seq <- read.csv2(filename.final.BA.no.growth); final.BA.no.growth.seq <- final.BA.no.growth.seq$x
+
+
+# Growth and Preferential Attachment (missing because of 0 degree node)
+
+
+# plot
+
+
+
+# Growth and Random attachment
+
+# models with relative values
+df2 = suppressWarnings(model_selection_degree_distribution(final.BA.Rand.Att.seq))
+# parameter of best model
+opt_param = df2[which.min(df2$AIC),]$Param1
+# geometric distribution
+geom_param = df2[2,"Param1"]
+
+# plot
+h = hist(final.BA.Rand.Att.seq, breaks = 100, plot = FALSE)
+h$counts = h$counts/sum(h$counts)
+plot(h, main = "Random Attachment+Growth", ylab = "Probability", xlab = "x")
+points(dpois(0:max(final.BA.Rand.Att.seq), lambda = opt_param), col = "red", pch=19)
+points(dgeom(0:max(final.BA.Rand.Att.seq), prob =  geom_param), col = "blue", pch=19)
+legend("topright", legend = c("Poisson", "Geometric"), pch = 19, col=c("red", "blue"))
+grid()
+box()
+
+# No growth and Preferential attachment
+
+# models with relative values
+df3 = suppressWarnings(model_selection_degree_distribution(final.BA.no.growth.seq))
+# parameter of best model
+opt_param = df3[which.min(df3$AIC),]$Param1
+
+# plot
+h = hist(final.BA.no.growth.seq, breaks = 100, plot = FALSE)
+h$counts = h$counts/sum(h$counts)
+plot(h, main = "Preferential Attachment+ NO Growth", ylab = "Probability", xlab = "x", col = "grey")
+points(dpois(0:max(final.BA.no.growth.seq), lambda = 3.920691), col = "orchid", pch = 19)
+legend("topright", legend = c("Poisson"), pch = 19, col=c("orchid"))
+box()
+grid()
 
