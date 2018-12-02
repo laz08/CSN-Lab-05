@@ -40,7 +40,7 @@ Each time $t$ increases on every iteration, a stub is going to be added. Each st
 
 This will be performed until reaching $t_{max}$, when the total number of nodes $N$ will be $$N = n_{0} + t_{max} = 3 + 10.000 = 10.003$$
 
-In the third case, B.A.'' (No growth + preferential attachment), we start with 2.000 nodes and end with the same number of nodes. We have chosen a somewhat big number of nodes as suggested in the lab session statement. More specifically, the suggestion was that $N \gt 1000$, and $t_{max}$ has been preserved as in the other two models to preserve coherency. Having a greater $t_{max}$ would have led to a complete graph which is not what we want to achieve.
+In the third case, B.A.'' (No growth + preferential attachment), we start with 2.000 nodes and end with the same number of nodes. We have chosen a somewhat big number of nodes as suggested in the lab session statement. More specifically, the suggestion was that $N \ge 1000$, and $t_{max}$ has been preserved as in the other two models to preserve coherency. Having a greater $t_{max}$ would have led to a complete graph which is not what we want to achieve.
 
 In those 2 cases where preferential attachment is what determines where each edge from the stub connects to, the higher the number of edges an existing node has, the higher the probability it has to be the one selected for the new addition.
 
@@ -64,12 +64,12 @@ Now we are going to see how is the evolution of 4 vertices until reaching $t_{ma
 
 ## Evolution
 
-```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert (Growth + Preferential attachment) evolution for 4 vertices"}
+```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
 plotAllEvolutions(table.BA, "B.A.: Growth + Preferential attachment")
 ```
-In the plot above we can  observe how the first vertex is selected a lot because of the preferential attachment. As the vertex selected chosen is that from a stub added forward in time, clearly its edge degree is going to be lower, thus having a lower preferential attachment for the next iterations. Thus, vertex 100 reaches its highest point at 15 edges, and edge 1000 just has 2: the ones created when the node was added as a stub.
+In the plot above we can  observe how the first vertex is selected a lot because of the preferential attachment. As the vertex selected chosen is that from a stub added forward in time, clearly its edge degree is going to be lower, thus having a lower preferential attachment for the next iterations. Thus, vertex 100 reaches its highest point at 6 edges, and edge 1000 just 3: the ones created when the node was added as a stub and another iteration where it got selected.
 
-```{r cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert' (Growth + Random attachment) evolution for 4 vertices"}
+```{r cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
 plotAllEvolutions(table.BA.Rand, "B.A.': Growth + Random attachment")
 ```
 
@@ -79,7 +79,7 @@ That's why their edge degree reach a higher point than vertices 100 and 1000.
 
 We can also see how on the last 9000 iterations, vertex 1000 got luckier than vertex 100, for it has one more edge than the other one. Thus, we can see how the randomness plays its hand on the attachment of stubs.
 
-```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert\'\' (No Growth + Preferential attachment) evolution for 4 vertices"}
+```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
 plotAllEvolutions(table.BA.no.growth, "B.A.'': No Growth + Preferential attachment")
 ```
 In this case we can see how the no-growth and preferential attachment have their effects on the simulation model.
@@ -89,26 +89,69 @@ On the first iteration all vertices (2000) have the same chance to get selected.
 In this case, it seems that vertex 1000 got lucky and got selected a lot more than its 3 other counterparts.
 
 
-## Theoretical $k\\_{i}$
+## Theoretical ki
 
 Now let's take a look on how these vertices' evolution grow comparing them with the theoretical $k_{i}$. Each simulation has its own theoretical average growth.
 
 ### Growth and preferential attachment
 
-On the first simulation model, the formula to follow is $$m_{0}^{t_{0}} = m_{0} \sqrt{t_{0}}$$
+On the first simulation model, the formula to follow is $$k_{i}''(t) = m_{0}^{t_{0}} = m_{0} \sqrt{t_{0}}$$
 
 This theoretical evolution has been painted in pink in the plot below.
-```{r echo=FALSE}
-plot_ki(table.BA, "right", "gp") # growth preferential
+
+
+```{r echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+plot_ki(table.BA, "topleft", "gp") # growth preferential
 ```
 
 We can see how vertex 1 follows somewhat closely that theoretical evolution. Of course, the vertices added later in time do not follow this evolution, for they have a lower chance to get chosen on the preferential attachment.
 
 
+```{r echo=FALSE}
+kable(suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth))))
+```
+
+In this table....
+TODO: Piero, can you comment on this?
+
+
+### Growth and random attachment
+
+Now the scalingof vertex degree over time is as follows:
+$$k_{i}''(t) = m_{0} log(m_{0} + t - 1)$$
+
+We can see how the first vertex follows it closely and the other 3 also tend to stagnate (later, of course, since they are added later on).
+
+```{r echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+plot_ki(table.BA.Rand, "bottomright", "gr") # growth random
+```
+
+```{r echo=FALSE}
+kable(suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth))))
+```
+TODO: Piero, can you comment on this?
+
+
+### No Growth and preferential attachment
+
+Now $$k_{i}(t) =  \frac{2 m_{0}}{n_{0}} t$$ for every vertex.
+
+We can see how, more or less, they all follow this vertex degree scaling. They vary a little because of the preferential attachment.
+
+```{r echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+plot_ki(table.BA.no.growth, "bottomright", "ngp") # no growth preferential
+```
+
+```{r echo=FALSE}
+kable(suppressWarnings(do.call(rbind, apply(table.BA.no.growth[,-1],2, model_selection_vertex_growth))))
+```
+
+TODO: Piero, can you comment on this??
+
 # Conclusions
 
 We can see how x model fits ...
 
-Some possible future work would be to see whether the best fitting distributions change when $$n_{0} \gt 3$$ and $$m_{0} \gt 2$$
+Some possible future work would be to see whether the best fitting distributions change when $$n_{0} \ge 3$$ and $$m_{0} \ge 2$$
 
 Since we have not had enough time to perform these tests, we have made these two parameters static. It would be interesting to see the effects on changing them.

@@ -66,13 +66,13 @@ n.0 = 3
 t = seq(t.max+1)
 
 
-#suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth)))
+suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth)))
 plot_ki(table.BA, "right", "gp") # growth preferential
 
-#suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth)))
+suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth)))
 plot_ki(table.BA.Rand, "bottomright", "gr") # growth random
 
-#suppressWarnings(do.call(rbind, apply(table.BA.no.growth[,-1],2, model_selection_vertex_growth)))
+suppressWarnings(do.call(rbind, apply(table.BA.no.growth[,-1],2, model_selection_vertex_growth)))
 plot_ki(table.BA.no.growth, "bottomright", "ngp") # no growth preferential
 
 
@@ -85,6 +85,9 @@ final.BA.seq <- read.csv2(filenameBAFinal); final.BA.seq <- final.BA.seq$x
 final.BA.Rand.Att.seq <- read.csv2(filenameBA.Rand.Att.Final); final.BA.Rand.Att.seq <- final.BA.Rand.Att.seq$x
 final.BA.no.growth.seq <- read.csv2(filename.final.BA.no.growth); final.BA.no.growth.seq <- final.BA.no.growth.seq$x
 
+
+if(FALSE){
+    
 
 # Growth and Preferential Attachment (missing because of 0 degree node)
 df1 = suppressWarnings(model_selection_degree_distribution(final.BA.seq))
@@ -136,4 +139,4 @@ points(dpois(0:max(final.BA.no.growth.seq), lambda = 3.920691), col = "orchid", 
 legend("topright", legend = c("Poisson"), pch = 19, col=c("orchid"))
 box()
 grid()
-
+}
