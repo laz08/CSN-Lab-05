@@ -86,10 +86,9 @@ final.BA.Rand.Att.seq <- read.csv2(filenameBA.Rand.Att.Final); final.BA.Rand.Att
 final.BA.no.growth.seq <- read.csv2(filename.final.BA.no.growth); final.BA.no.growth.seq <- final.BA.no.growth.seq$x
 
 
-if(FALSE){
-    
 
-# Growth and Preferential Attachment (missing because of 0 degree node)
+# Fitting ----------------------------------
+# Growth and Preferential Attachment 
 df1 = suppressWarnings(model_selection_degree_distribution(final.BA.seq))
 # parameter of best model
 minAIC.1 <- which.min(df1$AIC)
@@ -98,11 +97,8 @@ opt_param1 = df1[minAIC.1,]$Param1
 # geometric distribution
 geom_param1 = df1[minAIC.1,"Param1"]
 
-# plot
 
-
-# Growth and Random attachment
-
+# Growth and Random attachment    
 # models with relative values
 df2 = suppressWarnings(model_selection_degree_distribution(final.BA.Rand.Att.seq))
 # parameter of best model
@@ -112,31 +108,49 @@ opt_param = df2[minAIC.2,]$Param1
 # geometric distribution
 poisson_param = df2[minAIC.2,"Param1"]
 
-# plot
-h = hist(final.BA.Rand.Att.seq, breaks = 100, plot = FALSE)
-h$counts = h$counts/sum(h$counts)
-plot(h, main = "Random Attachment+Growth", ylab = "Probability", xlab = "x")
-points(dpois(0:max(final.BA.Rand.Att.seq), lambda = opt_param), col = "red", pch=19)
-points(dgeom(0:max(final.BA.Rand.Att.seq), prob =  geom_param), col = "blue", pch=19)
-legend("topright", legend = c("Poisson", "Geometric"), pch = 19, col=c("red", "blue"))
-grid()
-box()
 
 # No growth and Preferential attachment
-
 # models with relative values
 df3 = suppressWarnings(model_selection_degree_distribution(final.BA.no.growth.seq + 1))
 # parameter of best model
 minAIC.3 <- which.min(df3$AIC)
 cat("Best fit. distrib; B.A. NO Growth + Random:", as.character(df3[minAIC.3,]$Model), "\n")
 opt_param = df3[which.min(df3$AIC),]$Param1
+# geometric distribution
+geom_param2 = df3[minAIC.3,"Param1"]
 
-# plot
-h = hist(final.BA.no.growth.seq, breaks = 100, plot = FALSE)
-h$counts = h$counts/sum(h$counts)
-plot(h, main = "Preferential Attachment+ NO Growth", ylab = "Probability", xlab = "x", col = "grey")
-points(dpois(0:max(final.BA.no.growth.seq), lambda = 3.920691), col = "orchid", pch = 19)
-legend("topright", legend = c("Poisson"), pch = 19, col=c("orchid"))
-box()
-grid()
+# False because we do not want this to be plotted.
+if(FALSE){
+    
+    # plot
+    t = table(final.BA.seq)
+    prob = t/sum(t)
+    plot(as.vector(prob), main = "Growth + Preferential attachment", ylab = "Probability", xlab = "x", col="black", cex=0.55)
+    lines(as.vector(prob), col = "blue", lwd = 3.5)
+    lines(dgeom(0:max(final.BA.seq), prob =  geom_param1), col = "red", lwd = 2)
+    grid()
+    box()
+    legend("topright", legend = c("Geometric", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
+    
+   
+    # plot
+    t = table(final.BA.Rand.Att.seq)
+    prob = t/sum(t)
+    plot(as.vector(prob), main = "Growth + Random attachment", ylab = "Probability", xlab = "x", col="black", cex=0.55)
+    lines(as.vector(prob), col = "blue", lwd = 3.5)
+    lines(dpois(0:max(final.BA.seq), lambda =  poisson_param), col = "red", lwd = 2)
+    grid()
+    box()
+    legend("topright", legend = c("Poisson", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
+    
+    
+    # plot
+    t = table(final.BA.Rand.Att.seq)
+    prob = t/sum(t)
+    plot(as.vector(prob), main = "NO growth + Preferential Attachment", ylab = "Probability", xlab = "x", col = "grey")
+    lines(as.vector(prob), col = "blue", lwd = 3.5)
+    lines(dgeom(0:max(final.BA.Rand.Att.seq), prob =  geom_param2), col = "red", lwd = 2)
+    legend("topright", legend = c("Geometric", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
+    box()
+    grid()
 }

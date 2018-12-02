@@ -2,7 +2,9 @@
 title: "CSN 05 - Network Dynamics"
 author: "Laura Cebollero, Pietro Fronte"
 date: "25/11/2018"
-output: pdf_document
+output: 
+    pdf_document:
+        number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -64,12 +66,12 @@ Now we are going to see how is the evolution of 4 vertices until reaching $t_{ma
 
 ## Evolution
 
-```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+```{r  cache=T, echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
 plotAllEvolutions(table.BA, "B.A.: Growth + Preferential attachment")
 ```
 In the plot above we can  observe how the first vertex is selected a lot because of the preferential attachment. As the vertex selected chosen is that from a stub added forward in time, clearly its edge degree is going to be lower, thus having a lower preferential attachment for the next iterations. Thus, vertex 100 reaches its highest point at 6 edges, and edge 1000 just 3: the ones created when the node was added as a stub and another iteration where it got selected.
 
-```{r cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+```{r cache=T, echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
 plotAllEvolutions(table.BA.Rand, "B.A.': Growth + Random attachment")
 ```
 
@@ -79,7 +81,7 @@ That's why their edge degree reach a higher point than vertices 100 and 1000.
 
 We can also see how on the last 9000 iterations, vertex 1000 got luckier than vertex 100, for it has one more edge than the other one. Thus, we can see how the randomness plays its hand on the attachment of stubs.
 
-```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+```{r  cache=T, echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
 plotAllEvolutions(table.BA.no.growth, "B.A.'': No Growth + Preferential attachment")
 ```
 In this case we can see how the no-growth and preferential attachment have their effects on the simulation model.
@@ -89,7 +91,7 @@ On the first iteration all vertices (2000) have the same chance to get selected.
 In this case, it seems that vertex 1000 got lucky and got selected a lot more than its 3 other counterparts.
 
 
-## Theoretical ki
+## Scaling of vertex degree over time
 
 Now let's take a look on how these vertices' evolution grow comparing them with the theoretical $k_{i}$. Each simulation has its own theoretical average growth.
 
@@ -100,7 +102,7 @@ On the first simulation model, the formula to follow is $$k_{i}''(t) = m_{0}^{t_
 This theoretical evolution has been painted in pink in the plot below.
 
 
-```{r echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
 plot_ki(table.BA, "topleft", "gp") # growth preferential
 ```
 
@@ -122,7 +124,7 @@ $$k_{i}''(t) = m_{0} log(m_{0} + t - 1)$$
 
 We can see how the first vertex follows it closely and the other 3 also tend to stagnate (later, of course, since they are added later on).
 
-```{r echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
 plot_ki(table.BA.Rand, "bottomright", "gr") # growth random
 ```
 
@@ -138,7 +140,7 @@ Now $$k_{i}(t) =  \frac{2 m_{0}}{n_{0}} t$$ for every vertex.
 
 We can see how, more or less, they all follow this vertex degree scaling. They vary a little because of the preferential attachment.
 
-```{r echo=FALSE, out.width="250px", out.height="250px", fig.align="center"}
+```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
 plot_ki(table.BA.no.growth, "bottomright", "ngp") # no growth preferential
 ```
 
@@ -147,6 +149,68 @@ kable(suppressWarnings(do.call(rbind, apply(table.BA.no.growth[,-1],2, model_sel
 ```
 
 TODO: Piero, can you comment on this??
+
+
+## Degree distribution
+
+Now let's check which degree distribution fits better each simulation model.
+
+To select the best distribution fitting our final degree sequence of each model, we are going to use the functions used on lab. session 2.
+
+Afterwards, we are going to select the model that has the lowest AIC value.
+
+### Growth and preferential attachment
+
+In this case, the model selected that has the lowest AIC, thus the model that best fits the final degree sequence is:
+
+```{r echo=FALSE}
+cat("Best fitting for B.A. Growth + preferential:", as.character(df1[minAIC.1,]$Model), " with parameter value", df1[minAIC.1,"Param1"] , "\n")
+```
+
+Let's see how this fits our degree distribution:
+```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
+ t = table(final.BA.seq)
+    prob = t/sum(t)
+    plot(as.vector(prob), main = "Growth + Preferential attachment", ylab = "Probability", xlab = "x", col="black", cex=0.55)
+    lines(as.vector(prob), col = "blue", lwd = 3.5)
+    lines(dgeom(0:max(final.BA.seq), prob =  geom_param1), col = "red", lwd = 2)
+    grid()
+    box()
+    legend("topright", legend = c("Geometric", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
+```
+
+### Growth and random attachment
+
+On the second model, the best fitting distribution is:
+```{r echo=FALSE}
+cat("Best fitting for B.A. Growth + random attachment:", as.character(df2[minAIC.2,]$Model), " with parameter value", df2[minAIC.2,"Param1"] , "\n")
+```
+
+```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
+ t = table(final.BA.Rand.Att.seq)
+    prob = t/sum(t)
+    plot(as.vector(prob), main = "Growth + Random attachment", ylab = "Probability", xlab = "x", col="black", cex=0.55)
+    lines(as.vector(prob), col = "blue", lwd = 3.5)
+    lines(dpois(0:max(final.BA.seq), lambda =  poisson_param), col = "red", lwd = 2)
+    grid()
+    box()
+    legend("topright", legend = c("Poisson", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
+```
+
+### No Growth and preferential attachment
+```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
+t = table(final.BA.Rand.Att.seq)
+    prob = t/sum(t)
+    plot(as.vector(prob), main = "NO growth + Preferential Attachment", ylab = "Probability", xlab = "x", col = "grey")
+    lines(as.vector(prob), col = "blue", lwd = 3.5)
+    lines(dgeom(0:max(final.BA.Rand.Att.seq), prob =  geom_param2), col = "red", lwd = 2)
+    legend("topright", legend = c("Geometric", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
+    box()
+    grid()
+```
+
+TODO: This does not make sense
+
 
 # Conclusions
 
