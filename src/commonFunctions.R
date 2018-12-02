@@ -275,22 +275,38 @@ model_selection_vertex_growth = function(i) {
 
 
 plot_ki = function(x, y, z){
-   plot(x[,2],main = "Fitting best model found", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(1000,t.max))
-   lines(x[,3], col="red", lwd = 2)
-   lines(x[,4], col = "green", lwd = 2)
-   lines(x[,5], col = "blue", lwd = 2)
+  
    # it depends on which graph we are plotting the theoretical distribution changes
    if (z=="gp"){
-      curve(m.0*sqrt(x), add = TRUE, col="orchid", lwd = 2)
+       plot(x[,2],main = "Fitting best model found", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max))
+       lines(x[,3], col="red", lwd = 2)
+       lines(x[,4], col = "green", lwd = 2)
+       lines(x[,5], col = "blue", lwd = 2)
+       
+      lines(m.0*sqrt(x[, 1]), col="orchid", lwd = 2)
    }else if(z=="gr"){
-      curve(m.0*log(m.0+x-1), add = TRUE, col="orchid", lwd = 2)
+       res = m.0*log(m.0+x[,1]-1)
+       idx = length(res) - 1
+
+       plot(x[,2],main = "Fitting best model found", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max), ylim = c(0, res[idx]))
+       lines(x[,3], col="red", lwd = 2)
+       lines(x[,4], col = "green", lwd = 2)
+       lines(x[,5], col = "blue", lwd = 2)
+      lines(m.0*log(m.0+x[,1]-1), add = TRUE, col="orchid", lwd = 2)
    }else if(z=="ngp"){
-      curve( ((2*m.0)/(n.0))*x, add = TRUE, col="orchid", lwd = 2)
+       
+       res =((2*m.0)/(n.0))*x[, 1]
+       idx = length(res) - 1
+       
+       plot(x[,2],main = "Fitting best model found", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max), ylim = c(0, res[idx]))
+       lines(x[,3], col="red", lwd = 2)
+       lines(x[,4], col = "green", lwd = 2)
+       lines(x[,5], col = "blue", lwd = 2)
+      lines(res, col="orchid", lwd = 2)
    }
       
    legend(y, legend = c("k1(t)", "k10(t)", "k100(t)", "k1000(t)", "theoretical k(t)"),
           lty = 1, lwd = 2,col = c("black", "red", "green", "blue", "orchid"))
 }
-
 
 

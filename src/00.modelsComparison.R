@@ -1,4 +1,6 @@
+# Clean Environment
 rm(list = ls())
+
 # Load and install necessary packages
 requiredPackages <- c("igraph", "ggplot2", "Matrix", "ggthemes", "gridExtra",
                       "minpack.lm", "stats4", "VGAM")
@@ -65,7 +67,7 @@ t = seq(t.max+1)
 
 
 suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth)))
-plot_ki(table.BA, "topleft", "gp") # growth preferential
+plot_ki(table.BA, "right", "gp") # growth preferential
 
 suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth)))
 plot_ki(table.BA.no.growth, "bottomright", "gr") # growth random
@@ -85,10 +87,15 @@ final.BA.no.growth.seq <- read.csv2(filename.final.BA.no.growth); final.BA.no.gr
 
 
 # Growth and Preferential Attachment (missing because of 0 degree node)
-
+df1 = suppressWarnings(model_selection_degree_distribution(final.BA.seq))
+# parameter of best model
+minAIC.1 <- which.min(df1$AIC)
+cat("Best fit. distrib; B.A. Growth + preferential:", as.character(df1[minAIC.1,]$Model), "\n")
+opt_param1 = df1[minAIC.1,]$Param1
+# geometric distribution
+geom_param1 = df1[minAIC.1,"Param1"]
 
 # plot
-
 
 
 # Growth and Random attachment
@@ -96,9 +103,11 @@ final.BA.no.growth.seq <- read.csv2(filename.final.BA.no.growth); final.BA.no.gr
 # models with relative values
 df2 = suppressWarnings(model_selection_degree_distribution(final.BA.Rand.Att.seq))
 # parameter of best model
-opt_param = df2[which.min(df2$AIC),]$Param1
+minAIC.2 <- which.min(df2$AIC)
+cat("Best fit. distrib; B.A. Growth + Random:", as.character(df2[minAIC.2,]$Model), "\n")
+opt_param = df2[minAIC.2,]$Param1
 # geometric distribution
-geom_param = df2[2,"Param1"]
+poisson_param = df2[minAIC.2,"Param1"]
 
 # plot
 h = hist(final.BA.Rand.Att.seq, breaks = 100, plot = FALSE)
@@ -113,8 +122,10 @@ box()
 # No growth and Preferential attachment
 
 # models with relative values
-df3 = suppressWarnings(model_selection_degree_distribution(final.BA.no.growth.seq))
+df3 = suppressWarnings(model_selection_degree_distribution(final.BA.no.growth.seq + 1))
 # parameter of best model
+minAIC.3 <- which.min(df3$AIC)
+cat("Best fit. distrib; B.A. NO Growth + Random:", as.character(df3[minAIC.3,]$Model), "\n")
 opt_param = df3[which.min(df3$AIC),]$Param1
 
 # plot

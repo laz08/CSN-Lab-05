@@ -16,14 +16,11 @@ filename.final.BA.no.growth <- "../data/BA_no_growth_v_10000.csv"
 
 getTwoRandomNodesPreferentialAttNoGrowth <- function(sum.kj, m.0, nodeList, k){
     
-    if(sum.kj == 0){
-        # First iteration, disconnected graph
-        pi.k = rep(1, length(k))
-    } else {
-        # Compute probs.
-        ## Adding offset so everyone has a chance to be selected
-        pi.k = (k/sum.kj) + 0.1
-    }
+
+    # Compute probs.
+    ## Adding offset so everyone has a chance to be selected
+    pi.k = ((k + 1)/(sum.kj + 1))
+
     selectedNodes <- sample(nodeList, m.0, prob = pi.k)
     return(selectedNodes)
 }
@@ -31,9 +28,8 @@ getTwoRandomNodesPreferentialAttNoGrowth <- function(sum.kj, m.0, nodeList, k){
 
 
 
-generateBarabasiAlbertModelNoGrowth <- function(ts, n.0, m.0, v.track) {
+generateBarabasiAlbertModelNoGrowth <- function(ts, n.max, m.0, v.track) {
     
-    n.max = ts
     nodeList = seq(n.max)   ## Vector representing idx from 1..n.max
     k = rep(0, n.max)       ## Degrees of each node. Start on 0
     sum.kj = 0              ## Total sum of degrees
@@ -47,7 +43,7 @@ generateBarabasiAlbertModelNoGrowth <- function(ts, n.0, m.0, v.track) {
     
     for(t in seq(ts)){
         
-        n = t
+        n = sample(nodeList, 1, prob = NULL)
         shouldGetRandNodes <- TRUE
         
         while(shouldGetRandNodes){
@@ -110,11 +106,11 @@ generateBarabasiAlbertModelNoGrowth <- function(ts, n.0, m.0, v.track) {
 
 runBANoGrowth <- function(t.max) {
     
-    n.0 <- t.max
     m.0 <- 2
+    n.max = 1500
     
     start = Sys.time()
-    k = generateBarabasiAlbertModelNoGrowth(t.max, n.0, m.0, timestamps)
+    k = generateBarabasiAlbertModelNoGrowth(t.max, n.max, m.0, timestamps)
     end = Sys.time()
     
     elapsedTime = end - start
