@@ -198,6 +198,12 @@ cat("Best fitting for B.A. Growth + random attachment:", as.character(df2[minAIC
 ```
 
 ### No Growth and preferential attachment
+
+Finally, on the third model, the best fitting distribution is:
+```{r echo=FALSE}
+cat("Best fitting for B.A. Growth + random attachment:", as.character(df3[minAIC.3,]$Model), " with parameter value", df3[minAIC.3,"Param1"] , "\n")
+```
+
 ```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
 t = table(final.BA.Rand.Att.seq)
     prob = t/sum(t)
