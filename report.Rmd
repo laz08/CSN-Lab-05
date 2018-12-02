@@ -40,7 +40,7 @@ Each time $t$ increases on every iteration, a stub is going to be added. Each st
 
 This will be performed until reaching $t_{max}$, when the total number of nodes $N$ will be $$N = n_{0} + t_{max} = 3 + 10.000 = 10.003$$
 
-In the third case, B.A.'' (No growth + preferential attachment), we start with 10.000 nodes and end with the same number of nodes.
+In the third case, B.A.'' (No growth + preferential attachment), we start with 2.000 nodes and end with the same number of nodes. We have chosen a somewhat big number of nodes as suggested in the lab session statement. More specifically, the suggestion was that $N \gt 1000$, and $t_{max}$ has been preserved as in the other two models to preserve coherency. Having a greater $t_{max}$ would have led to a complete graph which is not what we want to achieve.
 
 In those 2 cases where preferential attachment is what determines where each edge from the stub connects to, the higher the number of edges an existing node has, the higher the probability it has to be the one selected for the new addition.
 
@@ -50,11 +50,13 @@ However, to avoid having multi-edges on the third model, we have used a sparse a
 
 Below is a table that represents on average the time it has taken us to execute the three simulations:
 ```{r echo=FALSE}
-times = c(5, 3, 40)
+times = c(5, 3, 35)
 names = c("B.A.", "B.A.'", "B.A.''")
 times.df = data.frame(names, times)
 kable(times.df, caption = "Elapsed times on simulation runs", col.names = c("Simulation", "$\\Delta t (seconds)$ "))
 ```
+
+As mentioned, we can see how the third simulation (No growth + preferential attachment) is the one which has more cost computationally speaking because of the usage of the adjacency matrix.
 
 # Results
 Now we are going to see how is the evolution of 4 vertices until reaching $t_{max}$, as well as what distribution better fits each model.
@@ -65,17 +67,42 @@ Now we are going to see how is the evolution of 4 vertices until reaching $t_{ma
 ```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert (Growth + Preferential attachment) evolution for 4 vertices"}
 plotAllEvolutions(table.BA, "B.A.: Growth + Preferential attachment")
 ```
-
+In the plot above we can  observe how the first vertex is selected a lot because of the preferential attachment. As the vertex selected chosen is that from a stub added forward in time, clearly its edge degree is going to be lower, thus having a lower preferential attachment for the next iterations. Thus, vertex 100 reaches its highest point at 15 edges, and edge 1000 just has 2: the ones created when the node was added as a stub.
 
 ```{r cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert' (Growth + Random attachment) evolution for 4 vertices"}
 plotAllEvolutions(table.BA.Rand, "B.A.': Growth + Random attachment")
 ```
 
+Now that the random attachment is done, we can see how the vertices have more or less the same degree distribution. However, since it is a growth model the first vertices (i.e. 1 and 10) still have more chances to be selected on the first iterations, since the number of existing nodes is lower. 
 
+That's why their edge degree reach a higher point than vertices 100 and 1000. 
+
+We can also see how on the last 9000 iterations, vertex 1000 got luckier than vertex 100, for it has one more edge than the other one. Thus, we can see how the randomness plays its hand on the attachment of stubs.
 
 ```{r  cache=T, echo=FALSE, out.width="250px", out.height="250px", fig.align="center", fig.cap = "Barabasi Albert\'\' (No Growth + Preferential attachment) evolution for 4 vertices"}
 plotAllEvolutions(table.BA.no.growth, "B.A.'': No Growth + Preferential attachment")
 ```
+In this case we can see how the no-growth and preferential attachment have their effects on the simulation model.
+
+On the first iteration all vertices (2000) have the same chance to get selected. Afterwards, those that got lucky and got selected on the first iterations have a higher probability to get selected again.
+
+In this case, it seems that vertex 1000 got lucky and got selected a lot more than its 3 other counterparts.
+
+
+## Theoretical $k\\_{i}$
+
+Now let's take a look on how these vertices' evolution grow comparing them with the theoretical $k_{i}$. Each simulation has its own theoretical average growth.
+
+### Growth and preferential attachment
+
+On the first simulation model, the formula to follow is $$m_{0}^{t_{0}} = m_{0} \sqrt{t_{0}}$$
+
+This theoretical evolution has been painted in pink in the plot below.
+```{r echo=FALSE}
+plot_ki(table.BA, "right", "gp") # growth preferential
+```
+
+We can see how vertex 1 follows somewhat closely that theoretical evolution. Of course, the vertices added later in time do not follow this evolution, for they have a lower chance to get chosen on the preferential attachment.
 
 
 # Conclusions

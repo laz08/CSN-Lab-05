@@ -66,14 +66,14 @@ n.0 = 3
 t = seq(t.max+1)
 
 
-suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth)))
+#suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth)))
 plot_ki(table.BA, "right", "gp") # growth preferential
 
-suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth)))
-plot_ki(table.BA.no.growth, "bottomright", "gr") # growth random
+#suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth)))
+plot_ki(table.BA.Rand, "bottomright", "gr") # growth random
 
-suppressWarnings(do.call(rbind, apply(table.BA.no.growth[,-1],2, model_selection_vertex_growth)))
-plot_ki(table.BA.Rand, "bottomright", "ngp") # no growth preferential
+#suppressWarnings(do.call(rbind, apply(table.BA.no.growth[,-1],2, model_selection_vertex_growth)))
+plot_ki(table.BA.no.growth, "bottomright", "ngp") # no growth preferential
 
 
 

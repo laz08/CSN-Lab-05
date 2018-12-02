@@ -107,7 +107,7 @@ generateBarabasiAlbertModelNoGrowth <- function(ts, n.max, m.0, v.track) {
 runBANoGrowth <- function(t.max) {
     
     m.0 <- 2
-    n.max = 1500
+    n.max = 2000
     
     start = Sys.time()
     k = generateBarabasiAlbertModelNoGrowth(t.max, n.max, m.0, timestamps)

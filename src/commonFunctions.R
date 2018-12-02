@@ -278,27 +278,28 @@ plot_ki = function(x, y, z){
   
    # it depends on which graph we are plotting the theoretical distribution changes
    if (z=="gp"){
-       plot(x[,2],main = "Fitting best model found", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max))
+       plot(x[,2],main =  "Growth + Preferential attachment \n Vertices degree & Theoretical k(t) evolution",xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max))
        lines(x[,3], col="red", lwd = 2)
        lines(x[,4], col = "green", lwd = 2)
        lines(x[,5], col = "blue", lwd = 2)
-       
       lines(m.0*sqrt(x[, 1]), col="orchid", lwd = 2)
    }else if(z=="gr"){
        res = m.0*log(m.0+x[,1]-1)
        idx = length(res) - 1
 
-       plot(x[,2],main = "Fitting best model found", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max), ylim = c(0, res[idx]))
+       plot(x[,2],main = "Growth + Random attachment \n Vertices degree & Theoretical k(t) evolution", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max), ylim = c(0, res[idx]))
+        
        lines(x[,3], col="red", lwd = 2)
        lines(x[,4], col = "green", lwd = 2)
        lines(x[,5], col = "blue", lwd = 2)
-      lines(m.0*log(m.0+x[,1]-1), add = TRUE, col="orchid", lwd = 2)
+      lines(m.0*log(m.0+x[,1]-1), col="orchid", lwd = 2)
    }else if(z=="ngp"){
        
+       n.0 = 2000
        res =((2*m.0)/(n.0))*x[, 1]
        idx = length(res) - 1
        
-       plot(x[,2],main = "Fitting best model found", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max), ylim = c(0, res[idx]))
+       plot(x[,2],main = "NO Growth + Preferential attachment \n Vertices degree & Theoretical k(t) evolution", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max), ylim = c(0, res[idx]))
        lines(x[,3], col="red", lwd = 2)
        lines(x[,4], col = "green", lwd = 2)
        lines(x[,5], col = "blue", lwd = 2)
