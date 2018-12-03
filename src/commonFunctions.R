@@ -203,7 +203,7 @@ model_selection_degree_distribution = function(x){
    
    
    # AIC value for each distribution
-   AIC_vect = mapply(get_AIC, L, K, N)
+   AIC_vect = mapply(AIC, mle_for_2ll)
    
    
    df = data.frame("Model" = c("Poisson", "Geometric", "Zeta", "RT Zeta"),
@@ -240,9 +240,9 @@ model_selection_vertex_growth = function(i) {
    models_list = list(model0, model1, model2, model3, model4,
                       model0i, model1i, model2i, model3i, model4i)
    
-   get_RSS = function(x) return(sum(i-predict(x))^2) #check
+   get_RSS = function(x) return(sum(residuals(x)^2)) #check
    get_AIC = function(rss, par) return(t.max*log(2*pi) + t.max*log(rss/t.max) + t.max + 2*(par + 1))
-   get_params = function(x) return(as.vector(summary(x)$coefficients[,1]))
+   get_params = function(x) return(as.vector(coef(x)))
    
    # get parameter estimate from models..
    pm = lapply(models_list, get_params)
@@ -278,32 +278,36 @@ plot_ki = function(x, y, z){
   
    # it depends on which graph we are plotting the theoretical distribution changes
    if (z=="gp"){
-       plot(x[,2],main =  "Growth + Preferential attachment \n Vertices degree & Theoretical k(t) evolution",xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max))
+       
+       plot(x[,2],main =  "Growth + Preferential attachment \n Vertices degree & Theoretical k(t) evolution",xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(1000,t.max))
        lines(x[,3], col="red", lwd = 2)
        lines(x[,4], col = "green", lwd = 2)
        lines(x[,5], col = "blue", lwd = 2)
-      lines(m.0*sqrt(x[, 1]), col="orchid", lwd = 2)
+       lines(m.0*sqrt(x[, 1]), col="orchid", lwd = 2)
+       grid()
+       
    }else if(z=="gr"){
+       
        res = m.0*log(m.0+x[,1]-1)
        idx = length(res) - 1
-
-       plot(x[,2],main = "Growth + Random attachment \n Vertices degree & Theoretical k(t) evolution", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max), ylim = c(0, res[idx]))
-        
+       plot(x[,2],main = "Growth + Random attachment \n Vertices degree & Theoretical k(t) evolution", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(1000,t.max), ylim = c(0, res[idx]))
        lines(x[,3], col="red", lwd = 2)
        lines(x[,4], col = "green", lwd = 2)
        lines(x[,5], col = "blue", lwd = 2)
-      lines(m.0*log(m.0+x[,1]-1), col="orchid", lwd = 2)
+       lines(m.0*log(m.0+x[,1]-1), col="orchid", lwd = 2)
+       grid()
+       
    }else if(z=="ngp"){
        
        n.0 = 2000
        res =((2*m.0)/(n.0))*x[, 1]
        idx = length(res) - 1
-       
        plot(x[,2],main = "NO Growth + Preferential attachment \n Vertices degree & Theoretical k(t) evolution", xlab = "t", ylab = "k(t)", type = "l",lwd = 2, xlim = c(0,t.max), ylim = c(0, res[idx]))
        lines(x[,3], col="red", lwd = 2)
        lines(x[,4], col = "green", lwd = 2)
        lines(x[,5], col = "blue", lwd = 2)
-      lines(res, col="orchid", lwd = 2)
+       lines(res, col="orchid", lwd = 2)
+       grid()
    }
       
    legend(y, legend = c("k1(t)", "k10(t)", "k100(t)", "k1000(t)", "theoretical k(t)"),
