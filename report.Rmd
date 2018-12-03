@@ -2,9 +2,11 @@
 title: "CSN 05 - Network Dynamics"
 author: "Laura Cebollero, Pietro Fronte"
 date: "3rd of December, 2018"
-output: 
-    pdf_document:
-        number_sections: true
+output:
+  pdf_document:
+    number_sections: yes
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -106,15 +108,29 @@ This theoretical evolution has been painted in pink in the plot below.
 plot_ki(table.BA, "bottomright", "gp") # growth preferential
 ```
 
-We can see how vertex 1 follows somewhat closely that theoretical evolution. Of course, the vertices added later in time do not follow this evolution, for they have a lower chance to get chosen on the preferential attachment.
+We can see how vertex 1 follows somewhat closely that theoretical evolution. Of course, the vertices added later in time do not follow this evolution, for they have a lower chance to get chosen on the preferential attachment. The plot focus only in the range (1000,t.max), range where all the 4 selected points coexist.
 
 
 ```{r echo=FALSE}
 kable(suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth))))
 ```
 
-In this table....
-TODO: Piero, can you comment on this?
+In this part of the assignement we are asked to verify if the distribution that better fits the scaling of selected vertices is a power-law distribution with gamma $\gamma=\frac{1}{2}$. In order to verify it we perform a model selectio task as suggested in the statement. The results found are the following:
+
+- Scaling of vertex 1, for our model selection process, follows a logarithmic distribution. In details:
+\[ k_1(t) \sim a\log(t+d_1)+d_2 = 82.14\log(t+1887.5)-605 \]
+
+- Scaling of vertex 10, as previously expected, follows a power law distribution with a slightly modified $\gamma $ parameter. Instead of 0.5 tend more to 0.58
+\[ k_{10}(t) \sim at^b+d = 0.6t^{0.58}+0.53\]
+
+- Scaling of vertex 100, as for vertex 10, follows a p-law distribution but with a more free exponend.
+\[ k_{100}(t) \sim at^b+d = 0.16+t^{0.37}+0.54\]
+
+- Scaling of vertex 1000 appears really flat and it is diffult to get an idea of it visually. However the result obtained by model selection is the following:
+\[ k_{1000}(t) \sim a\log(t+d_1)+d_2 = 0.53\log(t-377.5)-2.33\] 
+  Notice that, since vertex exists only from t=1000 on, the argument of the logarithm will be always positive.
+  
+
 
 
 ### Growth and random attachment
@@ -132,7 +148,23 @@ plot_ki(table.BA.Rand, "bottomright", "gr") # growth random
 kable(suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth))))
 ```
 
-TODO: Piero, can you comment on this?
+
+When replacing preferential attachment with random attachment we are modifying the growth of the degree of each vertex. In this case all of them, in the range where they exist, are equally probable. With random attachment the theoretical scale of vertex should follow a logarithmic distribution and we are asked to check if actually this distribution is the one, with appropriate parameters, that better approximate the data collected.
+
+- Scaling of vertex 1, p-law with intercept as best distribution selected. In details:
+\[ k_1(t) \sim at^b+d = 101.34t^{1e^{-3}}-94\]
+
+- Scaling of vertex 10, p-law with intercept as best distribution selected.
+\[ k_{10}(t) \sim at^b+d = 44.6t^{0.03}-44.3\]
+
+- Scaling of vertex 100, again p-law with intercept.
+\[ k_{100}(t) \sim at^b+d = 44.8t^{0.02}-47.8 \]
+
+- Scaling of vertex 1000 is the only one that the model selection process find to be better approximated by a logarithmic distribution.
+\[ k_{1000}(t) \sim a\log(t+d_1)+d_2 = 3\log(t+235.7)-18.6\]
+
+We can also see, as suggested by the statement, that a $\approx$ m0 = 2. We can't say however the same for $d_1$, expected to be around m0-1 and obtained around 235. 
+
 
 
 ### No Growth and preferential attachment
@@ -149,8 +181,19 @@ plot_ki(table.BA.no.growth, "topleft", "ngp") # no growth preferential
 kable(suppressWarnings(do.call(rbind, apply(table.BA.no.growth[,-1],2, model_selection_vertex_growth))))
 ```
 
-TODO: Piero, can you comment on this??
+In presence of No Growth the theoretical scaling we are expecting to find is a linear model. However the results obtained don't confirm this idea. These are the results found:
 
+- Scaling of vertex 1 follows a power low distribution with these parameters:
+\[k_1(t) \sim at^b+d = 2e^{-7}t^{1.63}+0.27\]
+
+-Scaling of vertex 10 follows a logarithmic distribution with intercept:
+\[k_{10}(t) \sim a\log(t+d1)+d2 = 72.3\log(t+27725.6)-741.5\]
+
+-Scaling of vertex 100 approximated again with a logarithmic distribution with intercept:
+\[k_{100}(t) \sim a\log(t+d1)+d2 = 11\log(t+3904)-93.5 \]
+
+-Scaling of vertex 1000, this time vertex with the highest degree among the 4 nodes, approximated with p-law distribution:
+\[k_{1000}(t) \sim at^b+d = 2e^{-7}t^{1.75}+4\]
 
 ## Degree distribution
 
@@ -269,15 +312,15 @@ To finish with this project, we are going to summarize our conclusions on both t
 
 ## Vertex scaling
 
-In all the three models we have seen how they follow the theoretical vertex scaling pretty closely. 
+In all the three models we have seen, graphically, how they follow the theoretical vertex scaling pretty closely. 
 
 For the first two cases, since they are growing methods we can see how the evolution of the first vertex follows the  theoritical one. 
 
 However on nodes that have been added afterwards (i.e. 100) this scaling does not apply on the first model, or the growing stagnates earlier on the second one because of the preferential attachment.
 
 And finally, in the third model, since it is a no growth model, all the vertices seem to follow more or less the theoretical scaling vertex.
- 
-In conclusion, as far as the scaling vertex study concerns, the results have been satisfying and meeting our expectations.
+
+From a model selection point of view we had some results that didn't match our expectation and what we were asked to find from the statement. We don't even know where to locate a possible bug: either in the generating process of the graph or in the selection model task to pick the correct model. However, except for the No Growth + Preferential where a linear model is expected if looking at the plot and then not obtained, the result have been matching, overall, what found graphically.
 
 ## Degree distribution
 
@@ -296,4 +339,7 @@ So, to summarize, our conclusions are that there does not exist a clear degree d
 
 Some possible future work would be to see whether the best fitting distributions change when $$n_{0} \ge 3$$ and $$m_{0} \ge 2$$
 
-Since we have not had enough time to perform these tests, we have made these two parameters static instead of dynamic. It would be interesting to see the effects on changing them, although it may probably be very time consuming.
+Since we have not had enough time to perform these tests, we have made these two parameters static instead of dynamic. It would be interesting to see the effects on changing them, although it may probably be very time 
+
+
+
