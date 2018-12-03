@@ -66,7 +66,7 @@ generateBarabasiAlbertModelNoGrowth <- function(ts, n.max, m.0, v.track) {
         adj.mat[n2, n] <- 1
         
         ## Add num. of edges added on each it to the total sum
-        sum.kj <- sum.kj + m.0
+        sum.kj <- sum.kj + 4
         
         ## Increase degree of each vertice
         k[n1] <- k[n1] + 1
@@ -135,3 +135,4 @@ if(!LOAD_EXISTING_RUN_BA_NO_GROWTH){
 }
 
 table.BA.no.growth <- loadModelExecutions(filenamesBA.no.growth)
+final.BA.no.growth.seq <- read.csv2(filename.final.BA.no.growth); final.BA.no.growth.seq <- final.BA.no.growth.seq$x

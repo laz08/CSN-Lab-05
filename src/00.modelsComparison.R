@@ -112,45 +112,10 @@ poisson_param = df2[minAIC.2,"Param1"]
 # No growth and Preferential attachment
 # models with relative values
 df3 = suppressWarnings(model_selection_degree_distribution(final.BA.no.growth.seq + 1))
+df3
 # parameter of best model
 minAIC.3 <- which.min(df3$AIC)
 cat("Best fit. distrib; B.A. NO Growth + Random:", as.character(df3[minAIC.3,]$Model), "\n")
 opt_param = df3[which.min(df3$AIC),]$Param1
 # geometric distribution
 geom_param2 = df3[minAIC.3,"Param1"]
-
-# False because we do not want this to be plotted.
-if(FALSE){
-    
-    # plot
-    t = table(final.BA.seq)
-    prob = t/sum(t)
-    plot(as.vector(prob), main = "Growth + Preferential attachment", ylab = "Probability", xlab = "x", col="black", cex=0.55)
-    lines(as.vector(prob), col = "blue", lwd = 3.5)
-    lines(dgeom(0:max(final.BA.seq), prob =  geom_param1), col = "red", lwd = 2)
-    grid()
-    box()
-    legend("topright", legend = c("Geometric", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
-    
-   
-    # plot
-    t = table(final.BA.Rand.Att.seq)
-    prob = t/sum(t)
-    plot(as.vector(prob), main = "Growth + Random attachment", ylab = "Probability", xlab = "x", col="black", cex=0.55)
-    lines(as.vector(prob), col = "blue", lwd = 3.5)
-    lines(dpois(0:max(final.BA.seq), lambda =  poisson_param), col = "red", lwd = 2)
-    grid()
-    box()
-    legend("topright", legend = c("Poisson", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
-    
-    
-    # plot
-    t = table(final.BA.Rand.Att.seq)
-    prob = t/sum(t)
-    plot(as.vector(prob), main = "NO growth + Preferential Attachment", ylab = "Probability", xlab = "x", col = "grey")
-    lines(as.vector(prob), col = "blue", lwd = 3.5)
-    lines(dgeom(0:max(final.BA.Rand.Att.seq), prob =  geom_param2), col = "red", lwd = 2)
-    legend("topright", legend = c("Geometric", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
-    box()
-    grid()
-}

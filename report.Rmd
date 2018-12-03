@@ -1,7 +1,7 @@
 ---
 title: "CSN 05 - Network Dynamics"
 author: "Laura Cebollero, Pietro Fronte"
-date: "25/11/2018"
+date: "3rd of December, 2018"
 output: 
     pdf_document:
         number_sections: true
@@ -103,7 +103,7 @@ This theoretical evolution has been painted in pink in the plot below.
 
 
 ```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
-plot_ki(table.BA, "topleft", "gp") # growth preferential
+plot_ki(table.BA, "bottomright", "gp") # growth preferential
 ```
 
 We can see how vertex 1 follows somewhat closely that theoretical evolution. Of course, the vertices added later in time do not follow this evolution, for they have a lower chance to get chosen on the preferential attachment.
@@ -131,6 +131,7 @@ plot_ki(table.BA.Rand, "bottomright", "gr") # growth random
 ```{r echo=FALSE}
 kable(suppressWarnings(do.call(rbind, apply(table.BA.Rand[,-1],2, model_selection_vertex_growth))))
 ```
+
 TODO: Piero, can you comment on this?
 
 
@@ -141,7 +142,7 @@ Now $$k_{i}(t) =  \frac{2 m_{0}}{n_{0}} t$$ for every vertex.
 We can see how, more or less, they all follow this vertex degree scaling. They vary a little because of the preferential attachment.
 
 ```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
-plot_ki(table.BA.no.growth, "bottomright", "ngp") # no growth preferential
+plot_ki(table.BA.no.growth, "topleft", "ngp") # no growth preferential
 ```
 
 ```{r echo=FALSE}
@@ -153,7 +154,7 @@ TODO: Piero, can you comment on this??
 
 ## Degree distribution
 
-Now let's check which degree distribution fits better each simulation model.
+Now let's check which final degree distribution fits better each simulation model.
 
 To select the best distribution fitting our final degree sequence of each model, we are going to use the functions used on lab. session 2.
 
@@ -161,13 +162,22 @@ Afterwards, we are going to select the model that has the lowest AIC value.
 
 ### Growth and preferential attachment
 
-In this case, the model selected that has the lowest AIC, thus the model that best fits the final degree sequence is:
+First we compute the log likelihood of each distribution fitting our degree sequence. 
+
+The table below summarizes the AIC and best parameter obtained from each distribution.
+```{r echo=FALSE}
+kable(df1)
+```
+
+In this case, the distribution selected that has the lowest AIC, thus the model that best fits the final degree sequence is:
 
 ```{r echo=FALSE}
 cat("Best fitting for B.A. Growth + preferential:", as.character(df1[minAIC.1,]$Model), " with parameter value", df1[minAIC.1,"Param1"] , "\n")
 ```
 
-Let's see how this fits our degree distribution:
+In the table above we can see there is a large margin between the Geometric distribution's AIC and the rest.
+
+Let's see how this geometric distribution fits our degree distribution:
 ```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
  t = table(final.BA.seq)
     prob = t/sum(t)
@@ -179,49 +189,111 @@ Let's see how this fits our degree distribution:
     legend("topright", legend = c("Geometric", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
 ```
 
+As we can see above, the selected geometric distribution fits quite well our simulation degree sequence.
+
+
 ### Growth and random attachment
 
-On the second model, the best fitting distribution is:
+
+Now we are going to compute the log likelihood of each distribution fitting our degree sequence again for this new degree sequence:
+
+```{r echo=FALSE}
+kable(df2)
+```
+
+Thus, on the second model, the best fitting distribution is:
 ```{r echo=FALSE}
 cat("Best fitting for B.A. Growth + random attachment:", as.character(df2[minAIC.2,]$Model), " with parameter value", df2[minAIC.2,"Param1"] , "\n")
 ```
+
+We can see that the selected Poisson distribution is closely followed by the geometric function, so we are going to plot both of them to see how they fit our true degree sequence distribution:
 
 ```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
  t = table(final.BA.Rand.Att.seq)
     prob = t/sum(t)
     plot(as.vector(prob), main = "Growth + Random attachment", ylab = "Probability", xlab = "x", col="black", cex=0.55)
     lines(as.vector(prob), col = "blue", lwd = 3.5)
-    lines(dpois(0:max(final.BA.seq), lambda =  poisson_param), col = "red", lwd = 2)
+    lines(dpois(0:max(final.BA.Rand.Att.seq), lambda =  poisson_param), col = "green", lwd = 2)
+    lines(dgeom(0:max(final.BA.Rand.Att.seq), prob =  0.25), col = "red", lwd = 2)
     grid()
     box()
-    legend("topright", legend = c("Poisson", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
+    legend("topright", legend = c("Poisson", "Geometric", "Simulation degree sequence"), pch = 19, col=c("green","red" , "blue"))
 ```
+
+We can see that although the selected distribution that had the lowest AIC is the Poisson distribution. However, visually speaking, we can see that maybe it is the Geometric one that better fits our data.
+
+We have not found the reason for this miss-selection.
+
+TODO: Piero, maybe take a look at this plot above too? :/
+
 
 ### No Growth and preferential attachment
 
-Finally, on the third model, the best fitting distribution is:
+Finally, on the third model, let's see what the best distribution fitting our sequence is:
+
+```{r echo=FALSE}
+kable(df3)
+```
+
+We can see that the Geometric distribution is the one with the lowest AIC, followed somewhat closely by the geometric distribution.
+
+
 ```{r echo=FALSE}
 cat("Best fitting for B.A. Growth + random attachment:", as.character(df3[minAIC.3,]$Model), " with parameter value", df3[minAIC.3,"Param1"] , "\n")
 ```
 
+Let's plot the degree sequence against the poisson distribution and geometric one so we can compare them:
+
 ```{r echo=FALSE, out.width="300px", out.height="300px", fig.align="center"}
-t = table(final.BA.Rand.Att.seq)
+
+max.y = max(dpois(0:max(final.BA.no.growth.seq), lambda =  21))
+ t = table(final.BA.no.growth.seq)
+    t = as.vector(t)
     prob = t/sum(t)
-    plot(as.vector(prob), main = "NO growth + Preferential Attachment", ylab = "Probability", xlab = "x", col = "grey")
+    plot(as.vector(prob), main = "NO growth + Preferential Attachment", ylab = "Probability", xlab = "x", col = "grey", ylim = c(0, max.y))
     lines(as.vector(prob), col = "blue", lwd = 3.5)
-    lines(dgeom(0:max(final.BA.Rand.Att.seq), prob =  geom_param2), col = "red", lwd = 2)
-    legend("topright", legend = c("Geometric", "Simulation degree sequence"), pch = 19, col=c("red", "blue"))
+    lines(dgeom(0:max(final.BA.no.growth.seq), prob =  geom_param2), col = "red", lwd = 2)
+    lines(dpois(0:max(final.BA.no.growth.seq), lambda =  21), col = "green", lwd = 2)
     box()
     grid()
+    legend("topright", legend = c("Poisson", "Geometric", "Simulation degree sequence"), pch = 19, col=c("green","red" , "blue"))
 ```
 
-TODO: This does not make sense
+We can see how both the Poisson and the Geometric distribution may somewhat our simulation degree sequence.
+However, the obtained $\lambda$ is very large (21), which is what may affect this big peak around x = 20, thus making the Geometric distribution a better candidate.
 
 
 # Conclusions
 
-We can see how x model fits ...
+To finish with this project, we are going to summarize our conclusions on both the study on vertex scaling in the three models as well as their degree distributions study.
+
+## Vertex scaling
+
+In all the three models we have seen how they follow the theoretical vertex scaling pretty closely. 
+
+For the first two cases, since they are growing methods we can see how the evolution of the first vertex follows the  theoritical one. 
+
+However on nodes that have been added afterwards (i.e. 100) this scaling does not apply on the first model, or the growing stagnates earlier on the second one because of the preferential attachment.
+
+And finally, in the third model, since it is a no growth model, all the vertices seem to follow more or less the theoretical scaling vertex.
+ 
+In conclusion, as far as the scaling vertex study concerns, the results have been satisfying and meeting our expectations.
+
+## Degree distribution
+
+We have seen how on the first Barabasi Albert model (Growth + preferential attachment), the final degree distribution clearly follows a Geometric distribution.
+
+However, on the other two models it is unclear to us whether the selected distributions are correct or not.
+
+In the second model (Growth + random attachment), Poisson is selected because it has a lower AIC. Although if we take a look at the plot, visually speaking the Geometric distribution seems to fit better our degree sequence.
+
+And in the third model (No growth + Preferential attachment), the Geometric distribution is selected although Poisson could have been selected if the lambda were to be lower. We can see how it follows a somewhat Gaussian distribution with a head and tail on probability 0, which the Geometric does not have (it only has a decreasing tail).
+
+So, to summarize, our conclusions are that there does not exist a clear degree distribution that best fits our degree sequences on the last two models.
+
+
+## Future work
 
 Some possible future work would be to see whether the best fitting distributions change when $$n_{0} \ge 3$$ and $$m_{0} \ge 2$$
 
-Since we have not had enough time to perform these tests, we have made these two parameters static. It would be interesting to see the effects on changing them.
+Since we have not had enough time to perform these tests, we have made these two parameters static instead of dynamic. It would be interesting to see the effects on changing them, although it may probably be very time consuming.
