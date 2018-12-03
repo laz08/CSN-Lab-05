@@ -115,15 +115,15 @@ We can see how vertex 1 follows somewhat closely that theoretical evolution. Of 
 kable(suppressWarnings(do.call(rbind, apply(table.BA[,-1],2, model_selection_vertex_growth))))
 ```
 
-In this part of the assignement we are asked to verify if the distribution that better fits the scaling of selected vertices is a power-law distribution with gamma $\gamma=\frac{1}{2}$. In order to verify it we perform a model selectio task as suggested in the statement. The results found are the following:
+In this part of the assignment we are asked to verify if the distribution that better fits the scaling of selected vertices is a power-law distribution with gamma $\gamma=\frac{1}{2}$. In order to verify it we perform a model selection task as suggested in the statement. The results found are the following:
 
 - Scaling of vertex 1, for our model selection process, follows a logarithmic distribution. In details:
 \[ k_1(t) \sim a\log(t+d_1)+d_2 = 82.14\log(t+1887.5)-605 \]
 
-- Scaling of vertex 10, as previously expected, follows a power law distribution with a slightly modified $\gamma $ parameter. Instead of 0.5 tend more to 0.58
+- Scaling of vertex 10, as previously expected, follows a power law distribution with a slightly modified $\gamma$ parameter. Instead of 0.5 tend more to 0.58
 \[ k_{10}(t) \sim at^b+d = 0.6t^{0.58}+0.53\]
 
-- Scaling of vertex 100, as for vertex 10, follows a p-law distribution but with a more free exponend.
+- Scaling of vertex 100, as for vertex 10, follows a p-law distribution but with a more free exponent.
 \[ k_{100}(t) \sim at^b+d = 0.16+t^{0.37}+0.54\]
 
 - Scaling of vertex 1000 appears really flat and it is diffult to get an idea of it visually. However the result obtained by model selection is the following:
@@ -266,9 +266,6 @@ We can see that the selected Poisson distribution is closely followed by the geo
 We can see that although the selected distribution that had the lowest AIC is the Poisson distribution. However, visually speaking, we can see that maybe it is the Geometric one that better fits our data.
 
 We have not found the reason for this miss-selection.
-
-TODO: Piero, maybe take a look at this plot above too? :/
-
 
 ### No Growth and preferential attachment
 
